@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getWorkById, getWorksByType } from '@/lib/supabase';
 import Link from 'next/link';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -34,7 +34,21 @@ interface ContentBlock {
   layout?: string;
 }
 
-const IMAGE_LAYOUTS = [
+interface ImageLayout {
+  id: string;
+  name: string;
+  description: string;
+  columns: number;
+  containerClass: string;
+  imageClass: string;
+  mediaType: string;
+}
+
+interface WorkDetailPageProps {
+  params: { id: string };
+}
+
+const IMAGE_LAYOUTS: ImageLayout[] = [
   {
     id: 'layout1',
     name: 'Full Height',
@@ -91,8 +105,8 @@ const IMAGE_LAYOUTS = [
   }
 ];
 
-export default function WorkDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function WorkDetailPage({ params }: WorkDetailPageProps) {
+  const { id } = params;
   const [work, setWork] = useState<Work | null>(null);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,10 +160,10 @@ export default function WorkDetailPage({ params }: { params: Promise<{ id: strin
         
         if (data.content) {
           try {
-            const content = JSON.parse(data.content);
+            const content = JSON.parse(data.content) as ContentBlock[];
             setBlocks(content);
             
-            const textBlock = content.find((block: ContentBlock) => block.type === 'text');
+            const textBlock = content.find((block) => block.type === 'text');
             if (textBlock && editor) {
               editor.commands.setContent(textBlock.content);
             }
@@ -439,11 +453,11 @@ export default function WorkDetailPage({ params }: { params: Promise<{ id: strin
 
         <div className={styles.rightSection}>
           <div className={styles.contentContainer}>
-            {blocks.map((block, index) => {
+            {blocks.map((block) => {
               if (block.type === 'text') {
                 return (
                   <div key={block.id} className={styles.textBlock}>
-                    {editor && <EditorContent editor={editor} content={block.content} />}
+                    {editor && <EditorContent editor={editor} />}
                   </div>
                 );
               } else if (block.type === 'image' || block.type === 'video') {
