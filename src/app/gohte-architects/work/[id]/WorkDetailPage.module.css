@@ -1,0 +1,736 @@
+/* Main container styles */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: white;
+}
+
+/* Spacers */
+.topSpacer {
+  height: 4rem;
+}
+
+.bottomSpacer {
+  height: 4rem;
+}
+
+/* Content Wrapper */
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .contentWrapper {
+    flex-direction: row;
+    padding: 0 2rem;
+  }
+}
+
+/* Left Section */
+.leftSection {
+  width: 100%;
+  padding: 3rem 0;
+  order: 1;
+}
+
+@media (min-width: 1024px) {
+  .leftSection {
+    width: 40%;
+    padding-right: 2rem;
+    order: unset;
+  }
+}
+
+/* Sticky Container */
+.stickyContainer {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+}
+
+@media (min-width: 1024px) {
+  .stickyContainer {
+    position: sticky;
+    top: 7rem;
+  }
+}
+
+/* Back Button */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  color: #4b5563;
+  transition: color 0.2s;
+  font-size: 0.6rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-decoration: none;
+}
+
+.backText {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.backIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.backButton:hover {
+  color: #111827;
+}
+
+/* Work Title */
+.workTitle {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: #161616;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .workTitle {
+    font-size: 3.5rem;
+  }
+}
+
+/* Credits Section */
+.creditsSection {
+  margin-top: 1rem;
+}
+
+.creditsTitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #414040;
+}
+
+.creditsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0rem;
+}
+
+.creditColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.creditItem {
+  display: grid;
+  grid-template-rows: auto auto;
+  min-height: 3rem;
+  align-items: start;
+}
+
+.creditLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #414040;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.creditValue {
+  font-size: 0.7rem;
+  color: #808080;
+  line-height: 1.4;
+}
+
+/* Get Quote Button */
+.getQuoteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 130px;
+  height: 42px;
+  margin-top: 2rem;
+  background-color: #161616;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.0em;
+  text-transform: uppercase;
+  border-radius: 21px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.4s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.buttonText {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.getQuoteButton:hover {
+  background-color: #D7A96D;
+}
+
+.getQuoteButton::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0;
+  transition: 
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 0.3s ease;
+}
+
+.getQuoteButton:hover::before {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.getQuoteButton:hover .buttonText {
+  transform: translateX(8px);
+}
+
+/* Right Section */
+.rightSection {
+  width: 100%;
+  padding: 1rem 0;
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .rightSection {
+    width: 60%;
+    padding-left: 2rem;
+    order: unset;
+  }
+}
+
+.contentContainer {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .contentContainer {
+    max-width: 56rem;
+    gap: 4rem;
+  }
+}
+
+.textBlock {
+  margin-bottom: 1rem;
+}
+
+.editor {
+  white-space: normal;
+  max-width: none;
+}
+
+.paragraph {
+  white-space: normal;
+  font-size: 0.85rem;
+  color: #414040;
+  margin: 0;
+  padding: 0;
+}
+
+/* Media Block Styles */
+.mediaBlockWrapper {
+  margin: 2rem 0;
+}
+
+/* Image Layouts */
+.fullHeightLayout {
+  width: 100%;
+  margin: 0;
+}
+
+.fullHeightImageContainer {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 300px;
+}
+
+@media (min-width: 768px) {
+  .fullHeightImageContainer {
+    height: 100vh;
+    min-height: 500px;
+    max-height: 1200px;
+  }
+}
+
+.autoHeightLayout {
+  width: 100%;
+  margin: 0;
+}
+
+.autoHeightImageContainer {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  max-height: 50vh;
+}
+
+@media (min-width: 768px) {
+  .autoHeightImageContainer {
+    max-height: none;
+  }
+}
+
+/* Two Column Layouts */
+.twoCol60_40FullHeightLayout,
+.twoCol40_60MediumHeightLayout,
+.twoCol60_40MediumHeightLayout {
+  width: 100%;
+  margin: 0;
+}
+
+.twoCol60_40FullHeightGrid {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  height: 50vh;
+  min-height: 300px;
+  gap: 0.5rem;
+  max-width: 52.5vw;
+}
+
+.twoCol40_60MediumHeightGrid {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  height: 45vh;
+  min-height: 280px;
+  gap: 0.5rem;
+  max-width: 52.5vw;
+}
+
+.twoCol60_40MediumHeightGrid {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  height: 90vh;
+  min-height: 560px;
+  gap: 0.5rem;
+  max-width: 52.5vw;
+}
+
+/* Margin top for both mobile and desktop */
+.twoCol40_60MediumHeightRightCol {
+  margin-top: 20vh;
+}
+
+.twoCol60_40MediumHeightLeftCol {
+  margin-top: 20vh;
+}
+
+@media (min-width: 768px) {
+  .twoCol60_40FullHeightGrid {
+    height: 100vh;
+    min-height: 500px;
+    max-height: 1200px;
+    gap: 1rem;
+  }
+  
+  .twoCol40_60MediumHeightGrid,
+  .twoCol60_40MediumHeightGrid {
+    height: 70vh;
+    min-height: 400px;
+    max-height: 800px;
+    gap: 1rem;
+  }
+}
+
+.twoCol60_40FullHeightCol,
+.twoCol40_60MediumHeightCol,
+.twoCol60_40MediumHeightCol {
+  position: relative;
+  height: 100%;
+}
+
+/* Common image styles */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.imageElement {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Video Layout */
+.videoLayout {
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 16/9;
+  max-height: 50vh;
+}
+
+@media (min-width: 768px) {
+  .videoLayout {
+    max-height: none;
+  }
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #000;
+}
+
+.videoIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.videoElement {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Bottom Section */
+.bottomSection {
+  display: flex;
+  flex-direction: column;
+  padding: 4rem 1rem;
+  order: 3;
+}
+
+@media (min-width: 1024px) {
+  .bottomSection {
+    flex-direction: row;
+    padding: 6rem 2rem;
+    order: unset;
+  }
+}
+
+.bottomLeftSection {
+  width: 100%;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .bottomLeftSection {
+    width: 40%;
+    padding-right: 2rem;
+    padding-bottom: 0;
+  }
+}
+
+.bottomRightSection {
+  width: 100%;
+  position: relative;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .bottomRightSection {
+    width: 60%;
+    padding-left: 2rem;
+  }
+}
+
+.exploreTitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #D7A96D;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .exploreTitle {
+    font-size: 0.8rem;
+  }
+}
+
+.exploreSubtitle {
+  font-size: 1.8rem;
+  color: #161616;
+  line-height: 1;
+  padding-right: 10rem;
+}
+
+@media (min-width: 768px) {
+  .exploreSubtitle {
+    font-size: 1.8rem;
+    padding-right: 0;
+    max-width: 80%;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Related Works Styles */
+.relatedWorkCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  gap: 0rem;
+}
+
+.workInfoContainer {
+  padding: 0rem;
+}
+
+.workNumber {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #161616;
+  display: flex;
+  align-items: center;
+  gap: 0rem;
+}
+
+.relatedImageContainer {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+  .relatedImageContainer {
+    height: 50vh;
+    min-height: 300px;
+  }
+}
+
+.relatedImage {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.viewWorkText {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  display: inline-block;
+}
+
+.viewWorkText::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+/* Hover effects */
+.relatedWorkCard:hover .relatedImage {
+  transform: scale(1.05);
+}
+
+.relatedWorkCard:hover .imageOverlay {
+  opacity: 1;
+}
+
+.relatedWorkCard:hover .viewWorkText::after {
+  width: 100%;
+}
+
+/* Slider Styles */
+.sliderWrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.sliderTrack {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: 100%;
+}
+
+.slide {
+  flex: 0 0 100%;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .slide {
+    flex: 0 0 50%;
+    padding: 0 1rem;
+  }
+}
+
+/* Slider Controls */
+.sliderControls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.sliderButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #161616;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.sliderButton:hover {
+  color: #000;
+  transform: scale(1.1);
+}
+
+.sliderButton svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Middle Section Styles */
+.middleSection {
+  width: 100%;
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  height: 40px;
+}
+
+.logo:hover {
+  opacity: 1;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 0.25rem solid #f3f4f6;
+  border-top-color: #111827;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error State */
+.errorContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.errorMessage {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+/* Not Found State */
+.notFoundContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.notFoundTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.notFoundMessage {
+  margin-bottom: 1rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #2563eb;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: #1e40af;
+}

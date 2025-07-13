@@ -1,0 +1,88 @@
+/* ContactHero.module.css */
+
+.heroWrapper {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  max-width: 100vw;
+  height: 100vh; /* Tinggi standar untuk desktop */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+}
+
+.heroBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%; /* Lebih tinggi dari wrapper untuk efek paralaks */
+  background-image: url('/ContactHero.jpg'); /* Ganti dengan path gambar Anda */
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+  /* Tambahkan properti untuk gambar yang lebih cepat dimuat di mobile jika ada versi mobile */
+  /* Misalnya: background-image: url('/images/contact-hero-bg-mobile.jpg'); */
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Tingkat kegelapan */
+  z-index: 2;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 3;
+  padding: 20px;
+}
+
+.heroContent h1 {
+  font-size: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.heroContent p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* --- */
+/* Media Queries untuk Optimasi Mobile */
+@media (max-width: 768px) {
+  .heroWrapper {
+    height: 40vh; /* Kurangi tinggi hero di mobile */
+  }
+
+  .heroContent h1 {
+    font-size: 2.5rem; /* Kurangi ukuran font di mobile */
+  }
+
+  .heroContent p {
+    font-size: 1rem; /* Kurangi ukuran font di mobile */
+  }
+
+}
+
+@media (max-width: 480px) {
+  .heroWrapper {
+    height: 35vh;
+  }
+
+  .heroContent h1 {
+    font-size: 2rem;
+  }
+
+  .heroContent p {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,297 @@
+.sectionContainer {
+  display: flex;
+  min-height: 100vh;
+  padding: 2rem;
+  margin-bottom: 4rem;
+  background-color: #ffffff;
+  gap: 0rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.leftColumn {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: 6rem;
+}
+
+.rightColumn {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.leftTop {
+  margin-bottom: 4rem;
+}
+
+.leftBottom {
+  margin-top: auto;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #D7A96D;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.sectionSubtitle {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1;
+  color: #161616;
+  padding-right: 8.5rem;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.descriptionText {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  color: #414040;
+  margin-bottom: 2.5rem;
+  max-width: 90%;
+}
+
+.imageRow {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.imageBlock {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.imageLabel {
+  font-weight: 600;
+  font-size: 14px;
+  color: #161616;
+  margin-bottom: 0.5rem;
+  order: 1;
+}
+
+.imageWrapper {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  order: 2;
+}
+
+.image40 {
+  width: 40%;
+}
+
+.image60 {
+  width: 60%;
+  height: 80vh;
+}
+
+.image100 {
+  width: 100%;
+}
+
+.offsetTop {
+  margin-top: 30vh;
+}
+
+.offsetBottom {
+  margin-top: 30vh;
+}
+
+.image40 .imageWrapper {
+  padding-bottom: 150%;
+}
+
+.image60 .imageWrapper {
+  padding-bottom: 66.67%;
+  height: 70vh;
+}
+
+.image100 .imageWrapper {
+  padding-bottom: 50%;
+}
+
+.imageContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  object-fit: cover;
+  transition: all 0.5s ease;
+}
+
+.hoverContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-align: center;
+}
+
+.hoverContent::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ffffff;
+}
+
+.imageContainer:hover .image {
+  transform: scale(1.05);
+  filter: brightness(0.3);
+}
+
+.imageContainer:hover .hoverContent {
+  opacity: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.circleBorder {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #1a1a1a;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.viewAllButton {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.underlineAnimation {
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  width: 0;
+  height: 1px;
+  background-color: #D7A96D;
+  transition: width 0.3s ease;
+}
+
+.buttonContainer:hover .circleBorder {
+  border-color: #D7A96D;
+  transform: scale(1.1);
+}
+
+.buttonContainer:hover .viewAllButton {
+  color: #D7A96D;
+}
+
+.buttonContainer:hover .underlineAnimation {
+  width: calc(100% - 0px);
+}
+
+@media (max-width: 1024px) {
+  .sectionContainer {
+    padding: 3rem 2rem;
+    gap: 2rem;
+  }
+  
+  .sectionSubtitle {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sectionContainer {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+
+  .leftColumn,
+  .rightColumn {
+    width: 100%;
+  }
+
+  .leftTop {
+    margin-bottom: 2rem;
+  }
+
+  .descriptionText {
+    max-width: 100%;
+  }
+
+  .imageRow {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .image40,
+  .image60,
+  .image100 {
+    width: 100%;
+  }
+
+  .imageLabel {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 2;
+    margin-bottom: 0;
+  }
+  
+  .imageWrapper {
+    padding-bottom: 100% !important;
+  }
+
+  .offsetTop,
+  .offsetBottom {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionContainer {
+    padding: 2rem 1rem;
+  }
+  
+  .sectionSubtitle {
+    font-size: 1.25rem;
+  }
+  
+  .descriptionText {
+    font-size: 0.875rem;
+  }
+}
