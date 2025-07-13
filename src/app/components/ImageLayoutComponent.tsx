@@ -1,11 +1,10 @@
 import React from 'react';
-import Image from 'next/image';
 
 interface ImageLayoutProps {
   node: {
     attrs: {
       src: string;
-      layout?: string;
+      layout?: 'default' | 'full-width' | 'left-text' | 'right-text' | 'grid-2' | 'centered';
     };
   };
   updateAttributes: (attributes: { layout: string }) => void;
@@ -19,22 +18,24 @@ const ImageLayoutComponent = (props: ImageLayoutProps) => {
     updateAttributes({ layout: newLayout });
   };
 
+  const renderImage = () => (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img 
+      src={src} 
+      className="w-full h-auto rounded-lg" 
+      alt="" 
+      key={src} // Added key for better React reconciliation
+    />
+  );
+
   const renderLayout = () => {
     switch (layout) {
       case 'full-width':
-        return (
-          <div className="w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} className="w-full h-auto rounded-lg" alt="" />
-          </div>
-        );
+        return <div className="w-full">{renderImage()}</div>;
       case 'left-text':
         return (
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="md:w-2/3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} className="w-full h-auto rounded-lg" alt="" />
-            </div>
+            <div className="md:w-2/3">{renderImage()}</div>
             <div className="md:w-1/3 bg-gray-100 p-4 rounded-lg">
               <p className="text-gray-500 italic">Add your text here</p>
             </div>
@@ -46,35 +47,24 @@ const ImageLayoutComponent = (props: ImageLayoutProps) => {
             <div className="md:w-1/3 bg-gray-100 p-4 rounded-lg">
               <p className="text-gray-500 italic">Add your text here</p>
             </div>
-            <div className="md:w-2/3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} className="w-full h-auto rounded-lg" alt="" />
-            </div>
+            <div className="md:w-2/3">{renderImage()}</div>
           </div>
         );
       case 'grid-2':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} className="w-full h-auto rounded-lg" alt="" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} className="w-full h-auto rounded-lg" alt="" />
+            {renderImage()}
+            {renderImage()}
           </div>
         );
       case 'centered':
         return (
           <div className="flex justify-center">
-            <div className="max-w-2xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} className="w-full h-auto rounded-lg" alt="" />
-            </div>
+            <div className="max-w-2xl">{renderImage()}</div>
           </div>
         );
       default:
-        return (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={src} className="w-full h-auto rounded-lg" alt="" />
-        );
+        return renderImage();
     }
   };
 
@@ -89,6 +79,7 @@ const ImageLayoutComponent = (props: ImageLayoutProps) => {
             className={`px-2 py-1 text-xs ${
               layout === layoutOption ? 'bg-blue-100' : 'bg-gray-100'
             } rounded`}
+            aria-label={`Change layout to ${layoutOption}`}
           >
             {layoutOption.replace('-', ' ')}
           </button>
