@@ -46,7 +46,7 @@ interface ImageLayout {
 
 interface WorkDetailPageProps {
   params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const IMAGE_LAYOUTS: ImageLayout[] = [
