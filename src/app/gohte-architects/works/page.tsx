@@ -17,6 +17,16 @@ interface Work {
   main_image?: string;
 }
 
+interface SupabaseWork {
+  id: string;
+  name: string;
+  type: 'Residential' | 'Commercial';
+  location: string;
+  completion_year: number;
+  description?: string;
+  main_image?: string;
+}
+
 export default function WorkGalleryPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +52,7 @@ export default function WorkGalleryPage() {
         const data = await getWorks();
         if (!data) throw new Error("No data returned");
         
-        const mappedData: Work[] = data.map((work: any) => ({
+        const mappedData: Work[] = data.map((work: SupabaseWork) => ({
           ...work,
           main_image: work.main_image || '/placeholder-image.jpg'
         }));
