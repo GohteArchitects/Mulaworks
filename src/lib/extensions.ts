@@ -1,4 +1,3 @@
-import { Extension } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import Image from '@tiptap/extension-image';
 import ImageLayoutComponent from '../app/components/ImageLayoutComponent';
