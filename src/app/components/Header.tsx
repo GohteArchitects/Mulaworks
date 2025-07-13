@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // Added Next.js Image component
 import styles from './Header.module.css';
 
 export default function Header() {
@@ -105,9 +106,12 @@ export default function Header() {
       >
         <div className={styles.container}>
           <Link href="/" className={styles.logo}>
-            <img 
-              src="/logo-1.svg" 
-              alt="Gohte Architects Logo" 
+            {/* Replaced img with Next.js Image component */}
+            <Image
+              src="/logo-1.svg"
+              alt="Gohte Architects Logo"
+              width={150} // Adjust based on your logo dimensions
+              height={50} // Adjust based on your logo dimensions
               className={`${styles.logoImage} ${isMenuOpen ? styles.lightLogo : ''}`}
             />
           </Link>
