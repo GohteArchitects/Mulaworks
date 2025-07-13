@@ -1,19 +1,7 @@
 import React from 'react';
-import Image from 'next/image';
 
-interface ImageAttributes {
-  src: string;
-  layout: string;
-}
-
-interface ImageLayoutProps {
-  node: {
-    attrs: ImageAttributes;
-  };
-  updateAttributes: (attrs: Partial<ImageAttributes>) => void;
-}
-
-const ImageLayoutComponent: React.FC<ImageLayoutProps> = ({ node, updateAttributes }) => {
+const ImageLayoutComponent = (props: any) => {
+  const { node, updateAttributes } = props;
   const { src, layout = 'default' } = node.attrs;
 
   const changeLayout = (newLayout: string) => {
@@ -25,27 +13,14 @@ const ImageLayoutComponent: React.FC<ImageLayoutProps> = ({ node, updateAttribut
       case 'full-width':
         return (
           <div className="w-full">
-            <Image 
-              src={src} 
-              className="w-full h-auto rounded-lg" 
-              alt="" 
-              width={1200}
-              height={800}
-              priority
-            />
+            <img src={src} className="w-full h-auto rounded-lg" alt="" />
           </div>
         );
       case 'left-text':
         return (
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-2/3">
-              <Image 
-                src={src} 
-                className="w-full h-auto rounded-lg" 
-                alt="" 
-                width={800}
-                height={600}
-              />
+              <img src={src} className="w-full h-auto rounded-lg" alt="" />
             </div>
             <div className="md:w-1/3 bg-gray-100 p-4 rounded-lg">
               <p className="text-gray-500 italic">Add your text here</p>
@@ -59,59 +34,27 @@ const ImageLayoutComponent: React.FC<ImageLayoutProps> = ({ node, updateAttribut
               <p className="text-gray-500 italic">Add your text here</p>
             </div>
             <div className="md:w-2/3">
-              <Image 
-                src={src} 
-                className="w-full h-auto rounded-lg" 
-                alt="" 
-                width={800}
-                height={600}
-              />
+              <img src={src} className="w-full h-auto rounded-lg" alt="" />
             </div>
           </div>
         );
       case 'grid-2':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Image 
-              src={src} 
-              className="w-full h-auto rounded-lg" 
-              alt="" 
-              width={600}
-              height={400}
-            />
-            <Image 
-              src={src} 
-              className="w-full h-auto rounded-lg" 
-              alt="" 
-              width={600}
-              height={400}
-            />
+            <img src={src} className="w-full h-auto rounded-lg" alt="" />
+            <img src={src} className="w-full h-auto rounded-lg" alt="" />
           </div>
         );
       case 'centered':
         return (
           <div className="flex justify-center">
             <div className="max-w-2xl">
-              <Image 
-                src={src} 
-                className="w-full h-auto rounded-lg" 
-                alt="" 
-                width={800}
-                height={600}
-              />
+              <img src={src} className="w-full h-auto rounded-lg" alt="" />
             </div>
           </div>
         );
       default:
-        return (
-          <Image 
-            src={src} 
-            className="w-full h-auto rounded-lg" 
-            alt="" 
-            width={1200}
-            height={800}
-          />
-        );
+        return <img src={src} className="w-full h-auto rounded-lg" alt="" />;
     }
   };
 
