@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image'; // Added Next.js Image component
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -11,10 +12,13 @@ export default function Footer() {
         <div className={styles.leftColumn}>
           <div className={styles.leftRow1}>
             <div className={styles.logoContainer}>
-              <Link href="/">
-                <img 
-                  src="/Logo-1.svg" 
-                  alt="Gohte Architects Logo" 
+              <Link href="/" passHref>
+                {/* Replaced img with Next.js Image component */}
+                <Image
+                  src="/Logo-1.svg"
+                  alt="Gohte Architects Logo"
+                  width={150} // Adjust based on your logo dimensions
+                  height={50} // Adjust based on your logo dimensions
                   className={styles.logo}
                 />
               </Link>
@@ -45,16 +49,24 @@ export default function Footer() {
             <div className={styles.navColumn}>
               <ul className={styles.navList}>
                 <li className={styles.navItem}>
-                  <Link href="/" className={styles.navLink}>Home</Link>
+                  <Link href="/" className={styles.navLink} passHref>
+                    Home
+                  </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/works" className={styles.navLink}>Works</Link>
+                  <Link href="/gohte-architects/works" className={styles.navLink} passHref>
+                    Works
+                  </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/about" className={styles.navLink}>About Us</Link>
+                  <Link href="/gohte-architects/about" className={styles.navLink} passHref>
+                    About Us
+                  </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/contact" className={styles.navLink}>Contact Us</Link>
+                  <Link href="/gohte-architects/contact" className={styles.navLink} passHref>
+                    Contact Us
+                  </Link>
                 </li>
               </ul>
             </div>
