@@ -17,18 +17,19 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        setError(error.message);
+      if (authError) {
+        setError(authError.message);
       } else {
         router.push('/gohte-architects/admin');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setError('An unexpected error occurred');
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
