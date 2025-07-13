@@ -156,16 +156,14 @@ const HomeSectionSix = () => {
         <div className={styles.formHeader}>
           <h2 className={styles.sectionTitle}>Get in touch</h2>
           <p className={styles.sectionSubtitle}>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            Start your journey with Gohte Architects. Whether it's a home, office, or a unique conceptual space, 
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            we're here to shape your vision to life.
+            Start your journey with Gohte Architects. Whether it&apos;s a home, office, or a unique conceptual space, 
+            we&apos;re here to shape your vision to life.
           </p>
         </div>
         
         {submitStatus === 'success' && (
           <div className={styles.successMessage}>
-            Thank you for your message! We'll get back to you soon.
+            Thank you for your message! We&apos;ll get back to you soon.
           </div>
         )}
         

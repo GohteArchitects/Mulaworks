@@ -211,7 +211,7 @@ const ContactPage = () => {
                 }
               }}
             >
-              Whether you have a project in mind or just want to say hello, feel free to reach out. Let's start a conversation.
+              Whether you have a project in mind or just want to say hello, feel free to reach out. Let&apos;s start a conversation.
             </motion.p>
           </div>
         </div>
@@ -268,14 +268,14 @@ const ContactPage = () => {
             <div className={styles.formHeader}>
               <h2 className={styles.sectionTitle}>Get in touch</h2>
               <p className={styles.sectionSubtitle}>
-                Start your journey with Gohte Architects. Whether it's a home, office, or a unique conceptual space, 
-                we're here to shape your vision to life.
+                Start your journey with Gohte Architects. Whether it&apos;s a home, office, or a unique conceptual space, 
+                we&apos;re here to shape your vision to life.
               </p>
             </div>
             
             {submitStatus === 'success' && (
               <div className={styles.successMessage}>
-                Thank you for your message! We'll get back to you soon.
+                Thank you for your message! We&apos;ll get back to you soon.
               </div>
             )}
             
