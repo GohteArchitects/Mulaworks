@@ -2,8 +2,14 @@ import React from 'react';
 import styles from './aboutsectiontwo.module.css';
 import Image from 'next/image';
 
+interface Publication {
+  year: string;
+  publication: string;
+  article: string;
+}
+
 const AboutSectionTwo = () => {
-  const publications = [
+  const publications: Publication[] = [
     { year: '2023', publication: 'Architectural Digest', article: 'Modern Minimalism in Urban Spaces' },
     { year: '2022', publication: 'Dwell Magazine', article: 'Sustainable Materials in Contemporary Design' },
     { year: '2021', publication: 'Dezeen', article: 'Blending Indoor and Outdoor Living' },
