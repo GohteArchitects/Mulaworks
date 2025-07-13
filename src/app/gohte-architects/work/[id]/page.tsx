@@ -44,9 +44,9 @@ interface ImageLayout {
   mediaType: string;
 }
 
-interface WorkDetailPageProps {
+interface PageProps {
   params: { id: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 const IMAGE_LAYOUTS: ImageLayout[] = [
@@ -106,7 +106,7 @@ const IMAGE_LAYOUTS: ImageLayout[] = [
   }
 ];
 
-export default function WorkDetailPage({ params }: WorkDetailPageProps) {
+export default function WorkDetailPage({ params }: PageProps) {
   const { id } = params;
   const [work, setWork] = useState<Work | null>(null);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
