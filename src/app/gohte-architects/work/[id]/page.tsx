@@ -10,6 +10,7 @@ import LinkExtension from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Image from 'next/image';
 import styles from './WorkDetailPage.module.css';
+import { notFound } from 'next/navigation';
 
 interface Work {
   id: string;
@@ -42,11 +43,6 @@ interface ImageLayout {
   containerClass: string;
   imageClass: string;
   mediaType: string;
-}
-
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 const IMAGE_LAYOUTS: ImageLayout[] = [
@@ -106,7 +102,7 @@ const IMAGE_LAYOUTS: ImageLayout[] = [
   }
 ];
 
-export default function WorkDetailPage({ params }: PageProps) {
+export default function WorkDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const [work, setWork] = useState<Work | null>(null);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
@@ -156,7 +152,10 @@ export default function WorkDetailPage({ params }: PageProps) {
     async function fetchWork() {
       try {
         const data = await getWorkById(id);
-        if (!data) throw new Error("Project not found");
+        if (!data) {
+          notFound();
+          return;
+        }
         setWork(data);
         
         if (data.content) {
