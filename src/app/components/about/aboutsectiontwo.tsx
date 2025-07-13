@@ -91,6 +91,7 @@ const AboutSectionTwo = () => {
                 </div>
                 <div className={styles.philosophyContent}>
                   <p className={styles.sectionText}>
+                    {/* eslint-disable-next-line react/no-unescaped-entities */}
                     At Gohte Architects, we believe that great design is both elegant and purposeful. We are passionate about crafting clean, modern environments that harmoniously integrate natural elements and elevate the way people live and work. Each project is a true collaboration — where our clients' visions meet our creative and technical expertise to produce spaces that are unique, meaningful, and enduring.
                   </p>
                 </div>
