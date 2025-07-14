@@ -12,12 +12,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
   }
 });
-
-// ... (tipe dan fungsi lainnya tetap sama)
 
 interface Work {
   id: string;
