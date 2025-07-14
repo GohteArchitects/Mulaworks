@@ -3,13 +3,33 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const loadingTimer = setTimeout(() => {
+      setIsReady(true);
+    }, 1200);
+
+    const transitionTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => {
+      clearTimeout(loadingTimer);
+      clearTimeout(transitionTimer);
+    };
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,63 +56,143 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Gohte Architects - Admin Login
-          </h2>
-        </div>
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            {error}
-          </div>
-        )}
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className={styles.loadingContainer}
+            initial={{ y: '100%' }}
+            animate={{ 
+              y: isReady ? '-100%' : '0%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+            exit={{ 
+              y: '-100%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+          >
+            <motion.div 
+              className={styles.loadingContent}
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: 1,
+                transition: { delay: 0.3, duration: 0.8 }
+              }}
+              exit={{ 
+                opacity: 0,
+                transition: { duration: 0.6 }
+              }}
             >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
+              <Image
+                src="/minilogo.svg"
+                alt="Gothe Architects Logo"
+                width={120}
+                height={40}
+                className={styles.loadingLogo}
+                priority
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className={styles.pageContainer}
+        initial={{ opacity: 0 }}
+        animate={{ 
+          opacity: isLoading ? 0 : 1,
+          transition: { 
+            duration: 1,
+            delay: 0.8,
+            ease: "easeOut"
+          }
+        }}
+      >
+        <div className={styles.loginContainer}>
+          <div className={styles.loginLeftColumn}>
+            <div className={styles.loginImageWrapper}>
+              <Image 
+                src="/GohteArchitects_Work_Eight.jpg" 
+                alt="Admin Login" 
+                fill
+                className={styles.loginImage}
+                priority
+              />
+            </div>
+            
+            <div className={styles.loginBranding}>
+              <Image
+                src="/minilogo.svg"
+                alt="Gothe Architects Logo"
+                width={180}
+                height={60}
+                className={styles.logo}
+              />
+              <h2 className={styles.brandingTitle}>Admin Portal</h2>
+              <p className={styles.brandingSubtitle}>Access the content management system</p>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+          
+          <div className={styles.loginRightColumn}>
+            <div className={styles.formHeader}>
+              <h2 className={styles.sectionTitle}>Admin Login</h2>
+              <p className={styles.sectionSubtitle}>
+                Please enter your credentials to access the admin dashboard
+              </p>
+            </div>
+            
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleLogin} className={styles.loginForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="email" className={styles.formLabel}>Email</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className={styles.formInput}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="password" className={styles.formLabel}>Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  className={styles.formInput}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <button 
+                type="submit" 
+                className={styles.submitButton}
+                disabled={loading}
+              >
+                <span className={styles.buttonText}>
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </motion.div>
+    </>
   );
 }
