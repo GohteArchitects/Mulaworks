@@ -263,7 +263,7 @@ export default function WorkGalleryPage() {
                     transition={{ duration: 0.5 }}
                     onMouseEnter={() => handleWorkHover(work)}
                   >
-                    <Link href={`/works/${work.id}`} className={styles.workLink}>
+                    <Link href={`/gohte-architects/work/${work.id}`} className={styles.workLink}>
                       <div className={styles.imageContainer}>
                         <Image
                           src={work.main_image || '/placeholder-project.svg'}
