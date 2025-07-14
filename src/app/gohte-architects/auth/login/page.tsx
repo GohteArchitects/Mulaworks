@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from './LoginPage.module.css';
@@ -12,52 +12,100 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Check existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      console.log('Session check:', { session, sessionError }); // Debug
+
+      if (session) {
+        console.log('Existing session found, redirecting...');
+        router.push('/gohte-architects/admin');
+        router.refresh();
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log('Attempting login with:', email); // Debug
       
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      // Step 1: Sign in
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('Login response data:', data); // Debug
-      console.log('Login error:', authError); // Debug
+      console.log('Login response:', { authData, authError }); // Debug
 
       if (authError) {
-        setError(authError.message);
+        console.error('Login error details:', authError);
+        setError(authError.message.includes('Invalid login credentials') 
+          ? 'Invalid email or password' 
+          : authError.message
+        );
         return;
       }
 
-      // Check if we actually got a user
-      if (!data?.user) {
-        setError('Login failed - no user returned');
+      // Step 2: Verify user data
+      if (!authData?.user) {
+        setError('Login failed - no user data returned');
         return;
       }
 
-      console.log('User logged in:', data.user.email); // Debug
+      console.log('User logged in:', authData.user.email); // Debug
 
-      // Verify session exists
-      const { data: sessionData } = await supabase.auth.getSession();
+      // Step 3: Get session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       console.log('Session data:', sessionData); // Debug
 
-      if (!sessionData?.session) {
-        setError('No session created after login');
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        setError('Failed to get session after login');
         return;
       }
 
-      // Try both methods to ensure redirect works
-      router.push('/gohte-architects/admin');
-      setTimeout(() => {
-        window.location.href = '/gohte-architects/admin';
-      }, 1000);
-      
+      // Step 4: Final verification
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('User verification:', user); // Debug
+
+      if (!user) {
+        setError('User verification failed');
+        return;
+      }
+
+      // Step 5: Redirect
+      if (sessionData?.session) {
+        console.log('Redirecting to admin...');
+        router.push('/gohte-architects/admin');
+        router.refresh();
+      } else {
+        setError('No active session detected after login');
+      }
+
     } catch (err: unknown) {
-      console.error('Unexpected login error:', err);
+      console.error('Unexpected error:', err);
       setError('An unexpected error occurred during login');
     } finally {
       setLoading(false);
@@ -92,6 +140,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="username"
+              autoFocus
             />
           </div>
           
