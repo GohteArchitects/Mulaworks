@@ -108,7 +108,7 @@ export default function Header() {
           <Link href="/" className={styles.logo}>
             {/* Replaced img with Next.js Image component */}
             <Image
-              src="/logoone.svg"
+              src="/Logoone.svg"
               alt="Gohte Architects Logo"
               width={150} // Adjust based on your logo dimensions
               height={50} // Adjust based on your logo dimensions
