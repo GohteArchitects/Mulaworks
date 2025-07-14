@@ -6,12 +6,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 2rem 0;
 }
 
 .loginWrapper {
   width: 100%;
   max-width: 400px;
-  padding: 4rem;
+  padding: 2rem;
 }
 
 /* Form Styles */
