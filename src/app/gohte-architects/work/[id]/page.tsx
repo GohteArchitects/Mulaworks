@@ -102,8 +102,12 @@ const IMAGE_LAYOUTS: ImageLayout[] = [
   }
 ];
 
-export default function WorkDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function WorkDetailPage({ params }: PageProps) {
+  const [id, setId] = useState<string>('');
   const [work, setWork] = useState<Work | null>(null);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,6 +116,15 @@ export default function WorkDetailPage({ params }: { params: { id: string } }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Resolve params on mount
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -150,6 +163,8 @@ export default function WorkDetailPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     async function fetchWork() {
+      if (!id) return;
+      
       try {
         const data = await getWorkById(id);
         if (!data) {
@@ -186,9 +201,7 @@ export default function WorkDetailPage({ params }: { params: { id: string } }) {
       }
     }
 
-    if (id) {
-      fetchWork();
-    }
+    fetchWork();
   }, [id, editor]);
 
   const nextSlide = () => {
