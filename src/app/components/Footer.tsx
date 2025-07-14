@@ -15,7 +15,7 @@ export default function Footer() {
               <Link href="/" passHref>
                 {/* Replaced img with Next.js Image component */}
                 <Image
-                  src="/Logo-1.svg"
+                  src="/Logoone.svg"
                   alt="Gohte Architects Logo"
                   width={150} // Adjust based on your logo dimensions
                   height={50} // Adjust based on your logo dimensions
