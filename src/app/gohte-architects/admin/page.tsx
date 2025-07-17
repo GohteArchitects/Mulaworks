@@ -1,12 +1,12 @@
+// Di app/gohte-architects/admin/page.tsx
 import Admin from '../../components/admin/admin';
-import ProtectedRoute from '../../components/ProtectedRoute';
 
 export default function AdminPage() {
   return (
-    <ProtectedRoute>
-      <div style={{ marginTop: '8rem' }} /> {/* Top spacer */}
+    <div>
+      <div style={{ marginTop: '8rem' }} />
       <Admin />
-      <div style={{ marginBottom: '8rem' }} /> {/* Bottom spacer */}
-    </ProtectedRoute>
+      <div style={{ marginBottom: '8rem' }} />
+    </div>
   );
 }
