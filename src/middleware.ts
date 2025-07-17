@@ -6,36 +6,49 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res })
 
-  // Refresh session if expired - required for Server Components
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  try {
+    // Refresh session if expired - required for Server Components
+    const {
+      data: { session },
+      error
+    } = await supabase.auth.getSession()
 
-  // Jika user mencoba mengakses halaman admin
-  if (request.nextUrl.pathname.startsWith('/gohte-architects/admin')) {
-    // Jika tidak ada session, redirect ke halaman login
-    if (!session) {
-      const redirectUrl = new URL('/gohte-architects/auth/login', request.url)
-      // Tambahkan parameter redirect untuk kembali ke halaman yang diminta setelah login
-      redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
-      return NextResponse.redirect(redirectUrl)
+    // Debug log untuk melihat session status
+    console.log('Middleware - Path:', request.nextUrl.pathname)
+    console.log('Middleware - Session:', session ? 'EXISTS' : 'NULL')
+    console.log('Middleware - User:', session?.user?.email || 'NO USER')
+    
+    if (error) {
+      console.log('Middleware - Error:', error)
     }
-  }
 
-  // Jika user sudah login dan mencoba mengakses halaman login
-  if (request.nextUrl.pathname === '/gohte-architects/auth/login') {
-    if (session) {
-      // Cek apakah ada parameter redirect
-      const redirectTo = request.nextUrl.searchParams.get('redirect')
-      const redirectUrl = redirectTo 
-        ? new URL(redirectTo, request.url)
-        : new URL('/gohte-architects/admin', request.url)
+    // Jika user mencoba mengakses halaman admin
+    if (request.nextUrl.pathname.startsWith('/gohte-architects/admin')) {
+      // Jika tidak ada session, redirect ke halaman login
+      if (!session) {
+        console.log('No session, redirecting to login')
+        const redirectUrl = new URL('/gohte-architects/auth/login', request.url)
+        return NextResponse.redirect(redirectUrl)
+      }
       
-      return NextResponse.redirect(redirectUrl)
+      // Jika ada session, biarkan akses ke admin
+      console.log('Session exists, allowing access to admin')
+      return res
     }
-  }
 
-  return res
+    // Jika user sudah login dan mencoba mengakses halaman login
+    if (request.nextUrl.pathname === '/gohte-architects/auth/login') {
+      if (session) {
+        console.log('Session exists, redirecting to admin from login page')
+        return NextResponse.redirect(new URL('/gohte-architects/admin', request.url))
+      }
+    }
+
+    return res
+  } catch (error) {
+    console.error('Middleware error:', error)
+    return res
+  }
 }
 
 export const config = {
