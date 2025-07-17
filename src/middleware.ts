@@ -5,27 +5,23 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res: response })
-  
-  // Dapatkan session pengguna
+
+  // Get user session
   const { data: { session } } = await supabase.auth.getSession()
   const path = request.nextUrl.pathname
 
-  // Proteksi route /gohte-architects/admin
+  // Protect admin routes
   if (path.startsWith('/gohte-architects/admin')) {
     if (!session) {
-      // Redirect ke login dengan mengembalikan URL asal untuk redirect setelah login
       const loginUrl = new URL('/gohte-architects/auth/login', request.url)
       loginUrl.searchParams.set('redirectedFrom', request.nextUrl.pathname)
       return NextResponse.redirect(loginUrl)
     }
-    
-    // Untuk single user, langsung izinkan akses jika sudah login
   }
 
-  // Proteksi route /gohte-architects/auth/login
-  if (path.startsWith('/gohte-architects/auth/login')) {
+  // Prevent access to login page when already logged in
+  if (path === '/gohte-architects/auth/login') {
     if (session) {
-      // Redirect ke halaman admin jika sudah login
       return NextResponse.redirect(new URL('/gohte-architects/admin', request.url))
     }
   }

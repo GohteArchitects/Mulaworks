@@ -8,12 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase credentials not configured');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
 
 interface Work {
   id: string;
