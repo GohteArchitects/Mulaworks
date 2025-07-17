@@ -186,7 +186,7 @@
 }
 
 .navMenuButton.open .hamburger:nth-child(2) {
-  transform: rotate(-45deg) translate(4px, -4px);
+  transform: rotate(-45deg) translate(2px, -2px);
 }
 
 .menuTitle {

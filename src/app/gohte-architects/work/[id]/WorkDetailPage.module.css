@@ -1,3 +1,40 @@
+/* Loading Styles - Matching Contact Page */
+.loadingContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #161616;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.loadingLogo {
+  animation: workLoadingLogoFloat 3s infinite ease-in-out;
+}
+
+@keyframes workLoadingLogoFloat {
+  0%, 100% { 
+    transform: translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: translateY(-15px) scale(1.03);
+    opacity: 1;
+  }
+}
+
+
 /* Main container styles */
 .pageContainer {
   display: flex;
@@ -8,7 +45,7 @@
 
 /* Spacers */
 .topSpacer {
-  height: 4rem;
+  height: 0rem;
 }
 
 .bottomSpacer {
@@ -18,47 +55,35 @@
 /* Content Wrapper */
 .contentWrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 1;
-  padding: 0 1rem;
-}
-
-@media (min-width: 1024px) {
-  .contentWrapper {
-    flex-direction: row;
-    padding: 0 2rem;
-  }
+  padding: 0 2rem;
+  align-items: flex-start;
+  position: relative;
 }
 
 /* Left Section */
 .leftSection {
-  width: 100%;
-  padding: 3rem 0;
-  order: 1;
-}
-
-@media (min-width: 1024px) {
-  .leftSection {
-    width: 40%;
-    padding-right: 2rem;
-    order: unset;
-  }
+  width: 40%;
+  padding: 0;
+  padding-right: 2rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 /* Sticky Container */
 .stickyContainer {
-  position: relative;
-  top: 0;
+  position: sticky;
+  top: 7rem;
+  height: 80vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0rem;
-}
-
-@media (min-width: 1024px) {
-  .stickyContainer {
-    position: sticky;
-    top: 7rem;
-  }
+  align-self: flex-start;
+  padding-bottom: 2rem;
 }
 
 /* Back Button */
@@ -90,17 +115,11 @@
 
 /* Work Title */
 .workTitle {
-  font-size: 1.8rem;
+  font-size: 3.5rem;
   font-weight: 400;
   color: #161616;
   line-height: 1.2;
   margin-bottom: 1rem;
-}
-
-@media (min-width: 768px) {
-  .workTitle {
-    font-size: 3.5rem;
-  }
 }
 
 /* Credits Section */
@@ -211,161 +230,136 @@
 
 /* Right Section */
 .rightSection {
-  width: 100%;
-  padding: 1rem 0;
-  order: 2;
-}
-
-@media (min-width: 1024px) {
-  .rightSection {
-    width: 60%;
-    padding-left: 2rem;
-    order: unset;
-  }
+  width: 60%;
+  padding-top: 4rem;
+  padding-left: 2rem;
+  height: 100%;
 }
 
 .contentContainer {
-  max-width: 100%;
+  max-width: 56rem;
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 0rem;
 }
 
-@media (min-width: 1024px) {
-  .contentContainer {
-    max-width: 56rem;
-    gap: 4rem;
-  }
+/* Text Block Container */
+.textBlockContainer {
+  width: 100%;
+  max-width: 100%;
+  margin:0;
+  padding: 0;
+  font-size: 14px;
+  color: #414040;
 }
 
 .textBlock {
-  margin-bottom: 1rem;
+  padding: 0rem;
 }
 
 .editor {
   white-space: normal;
   max-width: none;
+  line-height: 1.6;
 }
 
 .paragraph {
   white-space: normal;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #414040;
-  margin: 0;
+  margin: 0 0 1rem 0;
   padding: 0;
+  line-height: 1.7;
 }
 
-/* Media Block Styles */
+/* Media Block Wrapper */
 .mediaBlockWrapper {
-  margin: 2rem 0;
-}
-
-/* Image Layouts */
-.fullHeightLayout {
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
+  padding: 3rem 0;
 }
 
-.fullHeightImageContainer {
+/* Media Block Container */
+.mediaBlockContainer {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Layout 1: Full Height Container */
+.fullHeightContainer {
   position: relative;
   width: 100%;
-  height: 50vh;
-  min-height: 300px;
+  height: 80vh;
+  min-height: 500px;
+  max-height: 800px;
+  overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  .fullHeightImageContainer {
-    height: 100vh;
-    min-height: 500px;
-    max-height: 1200px;
-  }
-}
-
-.autoHeightLayout {
-  width: 100%;
-  margin: 0;
-}
-
-.autoHeightImageContainer {
+/* Layout 2: Auto Height Container */
+.autoHeightContainer {
   position: relative;
   width: 100%;
-  height: auto;
   aspect-ratio: 16/9;
-  max-height: 50vh;
+  max-height: 70vh;
+  overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  .autoHeightImageContainer {
-    max-height: none;
-  }
-}
-
-/* Two Column Layouts */
-.twoCol60_40FullHeightLayout,
-.twoCol40_60MediumHeightLayout,
-.twoCol60_40MediumHeightLayout {
+/* Layout 3: Two Column 60/40 Full Height */
+.twoColumnContainer {
   width: 100%;
-  margin: 0;
+  overflow: hidden;
 }
 
-.twoCol60_40FullHeightGrid {
-  display: grid;
-  grid-template-columns: 60% 40%;
-  height: 50vh;
-  min-height: 300px;
-  gap: 0.5rem;
-  max-width: 52.5vw;
+.twoColumn60_40 {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  height: 100vh;
+  min-height: 500px;
+  max-height: 100vh;
 }
 
-.twoCol40_60MediumHeightGrid {
-  display: grid;
-  grid-template-columns: 40% 60%;
-  height: 45vh;
-  min-height: 280px;
-  gap: 0.5rem;
-  max-width: 52.5vw;
-}
-
-.twoCol60_40MediumHeightGrid {
-  display: grid;
-  grid-template-columns: 60% 40%;
-  height: 90vh;
-  min-height: 560px;
-  gap: 0.5rem;
-  max-width: 52.5vw;
-}
-
-/* Margin top for both mobile and desktop */
-.twoCol40_60MediumHeightRightCol {
-  margin-top: 20vh;
-}
-
-.twoCol60_40MediumHeightLeftCol {
-  margin-top: 20vh;
-}
-
-@media (min-width: 768px) {
-  .twoCol60_40FullHeightGrid {
-    height: 100vh;
-    min-height: 500px;
-    max-height: 1200px;
-    gap: 1rem;
-  }
-  
-  .twoCol40_60MediumHeightGrid,
-  .twoCol60_40MediumHeightGrid {
-    height: 70vh;
-    min-height: 400px;
-    max-height: 800px;
-    gap: 1rem;
-  }
-}
-
-.twoCol60_40FullHeightCol,
-.twoCol40_60MediumHeightCol,
-.twoCol60_40MediumHeightCol {
+.column60 {
   position: relative;
+  width: 60%;
   height: 100%;
+  overflow: hidden;
+}
+
+.column40 {
+  position: relative;
+  width: 40%;
+  height: 80%;
+  overflow: hidden;
+}
+
+/* Layout 4: Two Column 40/60 with offset */
+.twoColumn40_60 {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  height: 100vh;
+  min-height: 500px;
+  max-height: 100vh;
+}
+
+.column60_offset {
+  position: relative;
+  width: 60%;
+  height: 100%;
+  margin-top: 0vh;
+  overflow: hidden;
+}
+
+/* Layout 5: Two Column 60/40 with left offset */
+.column60_offset {
+  position: relative;
+  width: 60%;
+  height: 70%;
+  margin-top: 30vh;
+  overflow: hidden;
 }
 
 /* Common image styles */
@@ -373,33 +367,28 @@
   position: relative;
   width: 100%;
   height: 100%;
+  background-color: #f8f9fa;
 }
 
 .imageElement {
   object-fit: cover;
   width: 100%;
   height: 100%;
+  transition: transform 0.3s ease;
 }
 
-/* Video Layout */
-.videoLayout {
-  width: 100%;
-  margin: 0;
-  aspect-ratio: 16/9;
-  max-height: 50vh;
+.imageContainer:hover .imageElement {
+  transform: scale(1.02);
 }
 
-@media (min-width: 768px) {
-  .videoLayout {
-    max-height: none;
-  }
-}
-
+/* Video Layout - Layout 6 */
 .videoContainer {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
   background-color: #000;
+  overflow: hidden;
+  max-height: 70vh;
 }
 
 .videoIframe {
@@ -417,43 +406,19 @@
 /* Bottom Section */
 .bottomSection {
   display: flex;
-  flex-direction: column;
-  padding: 4rem 1rem;
-  order: 3;
-}
-
-@media (min-width: 1024px) {
-  .bottomSection {
-    flex-direction: row;
-    padding: 6rem 2rem;
-    order: unset;
-  }
+  flex-direction: row;
+  padding: 2rem 2rem;
+  position: relative;
 }
 
 .bottomLeftSection {
-  width: 100%;
-  padding-bottom: 2rem;
-}
-
-@media (min-width: 1024px) {
-  .bottomLeftSection {
-    width: 40%;
-    padding-right: 2rem;
-    padding-bottom: 0;
-  }
+  width: 40%;
+  padding-right: 2rem;
 }
 
 .bottomRightSection {
-  width: 100%;
-  position: relative;
-  padding-bottom: 3rem;
-}
-
-@media (min-width: 1024px) {
-  .bottomRightSection {
-    width: 60%;
-    padding-left: 2rem;
-  }
+  width: 60%;
+  padding-left: 2rem;
 }
 
 .exploreTitle {
@@ -465,27 +430,13 @@
   text-transform: uppercase;
 }
 
-@media (min-width: 768px) {
-  .exploreTitle {
-    font-size: 0.8rem;
-  }
-}
-
 .exploreSubtitle {
   font-size: 1.8rem;
   color: #161616;
-  line-height: 1;
-  padding-right: 10rem;
-}
-
-@media (min-width: 768px) {
-  .exploreSubtitle {
-    font-size: 1.8rem;
-    padding-right: 0;
-    max-width: 80%;
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-  }
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  padding-right: 0;
+  max-width: 80%;
 }
 
 /* Related Works Styles */
@@ -517,13 +468,6 @@
   height: 70vh;
   overflow: hidden;
   flex-grow: 1;
-}
-
-@media (max-width: 768px) {
-  .relatedImageContainer {
-    height: 50vh;
-    min-height: 300px;
-  }
 }
 
 .relatedImage {
@@ -584,6 +528,7 @@
   width: 100%;
   overflow: hidden;
   position: relative;
+  padding-bottom: 3rem;
 }
 
 .sliderTrack {
@@ -593,16 +538,9 @@
 }
 
 .slide {
-  flex: 0 0 100%;
-  padding: 0 0.5rem;
+  flex: 0 0 50%;
+  padding: 0 1rem;
   box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .slide {
-    flex: 0 0 50%;
-    padding: 0 1rem;
-  }
 }
 
 /* Slider Controls */
@@ -610,9 +548,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 2rem;
   position: absolute;
-  right: 0;
+  right: 1rem;
   bottom: 0;
 }
 

@@ -1,72 +1,90 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import styles from './homehero.module.css';
 import Link from 'next/link';
 
 const HomeHero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  const circleRef = useRef<HTMLAnchorElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
   const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
-  const [opacity, setOpacity] = useState(0);
 
+  // Smooth follow effect with delay
+  useEffect(() => {
+    let animationFrameId: number;
+    const smoothingFactor = 0.1; // Adjust for more/less delay (0.05-0.2)
+    
+    const animate = () => {
+      setTargetPosition(prev => {
+        const dx = mousePosition.x - prev.x;
+        const dy = mousePosition.y - prev.y;
+        
+        return {
+          x: prev.x + dx * smoothingFactor,
+          y: prev.y + dy * smoothingFactor
+        };
+      });
+      
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    
+    if (isHovering) {
+      animationFrameId = requestAnimationFrame(animate);
+    } else {
+      // Reset position when not hovering
+      setTargetPosition(mousePosition);
+    }
+    
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [mousePosition, isHovering]);
+
+  // Mouse event handlers
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!heroRef.current) return;
-      
-      const rect = heroRef.current.getBoundingClientRect();
-      const isInside = (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      );
-      
-      setIsVisible(isInside);
-      
-      if (isInside) {
-        setTargetPosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        });
-      }
+      setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    const updatePosition = () => {
-      setPosition(prev => ({
-        x: prev.x + (targetPosition.x - prev.x) * 0.2,
-        y: prev.y + (targetPosition.y - prev.y) * 0.2
-      }));
-      
-      if (circleRef.current) {
-        circleRef.current.style.transform = `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`;
-      }
-      requestAnimationFrame(updatePosition);
+    const handleMouseEnter = () => {
+      setIsHovering(true);
     };
 
-    const updateOpacity = () => {
-      setOpacity(prev => {
-        const target = isVisible ? 1 : 0;
-        return Math.abs(prev - target) < 0.01 ? target : prev + (target - prev) * 0.1;
-      });
+    const handleMouseLeave = () => {
+      setIsHovering(false);
     };
 
-    const opacityInterval = setInterval(updateOpacity, 16);
-    const animationId = requestAnimationFrame(updatePosition);
-
-    window.addEventListener('mousemove', handleMouseMove);
+    const heroElement = heroRef.current;
+    if (heroElement) {
+      heroElement.addEventListener('mousemove', handleMouseMove);
+      heroElement.addEventListener('mouseenter', handleMouseEnter);
+      heroElement.addEventListener('mouseleave', handleMouseLeave);
+    }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      clearInterval(opacityInterval);
-      cancelAnimationFrame(animationId);
+      if (heroElement) {
+        heroElement.removeEventListener('mousemove', handleMouseMove);
+        heroElement.removeEventListener('mouseenter', handleMouseEnter);
+        heroElement.removeEventListener('mouseleave', handleMouseLeave);
+      }
     };
-  }, [targetPosition, position, isVisible]);
+  }, []);
 
   return (
     <section className={styles.heroContainer} ref={heroRef}>
+      {/* Hover Effect Element */}
+      <div 
+        className={`${styles.heroHoverEffect} ${isHovering ? styles.visible : ''}`}
+        style={{
+          left: `${targetPosition.x}px`,
+          top: `${targetPosition.y}px`,
+        }}
+      >
+        <div className={styles.arrowUp}></div>
+        <span className={styles.viewWorkText}>View Work</span>
+      </div>
+
       {/* Video Background */}
       <div className={styles.videoContainer}>
         <video 
@@ -75,27 +93,14 @@ const HomeHero = () => {
           muted 
           playsInline 
           className={styles.video}
+          preload="auto"
         >
           <source src="/HomeHero.mp4" type="video/mp4" />
         </video>
         <div className={styles.videoOverlay}></div>
       </div>
 
-      {/* Floating Cursor Circle */}
-      <Link 
-        href="/work" 
-        ref={circleRef}
-        className={styles.cursorCircle}
-        style={{ opacity }}
-        aria-label="View our work"
-      >
-        <svg className={styles.arrowIcon} viewBox="0 0 24 24">
-          <path d="M12 4l-8 8h5v8h6v-8h5z" fill="currentColor"/>
-        </svg>
-        <span className={styles.circleText}>View Work</span>
-      </Link>
-
-      {/* Top Row - Now using CSS Grid for precise spacing */}
+      {/* Top Row */}
       <div className={styles.topRow}>
         <div className={`${styles.column} ${styles.firstColumn}`}>
           <span className={styles.columnText}>featured work</span>
@@ -113,7 +118,9 @@ const HomeHero = () => {
 
       {/* Center Text */}
       <div className={styles.centerText}>
-        <h1 className={styles.mainHeading}>a breathing home</h1>
+        <h1 className={styles.mainHeading} aria-label="A breathing home">
+          a breathing home
+        </h1>
       </div>
 
       {/* Bottom Left Text */}

@@ -11,6 +11,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Image from 'next/image';
 import styles from './WorkDetailPage.module.css';
 import { notFound } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Work {
   id: string;
@@ -110,14 +111,29 @@ export default function WorkDetailPage({ params }: PageProps) {
   const [id, setId] = useState<string>('');
   const [work, setWork] = useState<Work | null>(null);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [relatedWorks, setRelatedWorks] = useState<Work[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  // Resolve params on mount
+  useEffect(() => {
+    const loadingTimer = setTimeout(() => {
+      setIsReady(true);
+    }, 1200);
+
+    const transitionTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => {
+      clearTimeout(loadingTimer);
+      clearTimeout(transitionTimer);
+    };
+  }, []);
+
   useEffect(() => {
     const resolveParams = async () => {
       const resolvedParams = await params;
@@ -177,11 +193,6 @@ export default function WorkDetailPage({ params }: PageProps) {
           try {
             const content = JSON.parse(data.content) as ContentBlock[];
             setBlocks(content);
-            
-            const textBlock = content.find((block) => block.type === 'text');
-            if (textBlock && editor) {
-              editor.commands.setContent(textBlock.content);
-            }
           } catch (e) {
             console.error("Error parsing content:", e);
             if (editor) {
@@ -196,8 +207,6 @@ export default function WorkDetailPage({ params }: PageProps) {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error occurred");
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -296,64 +305,50 @@ export default function WorkDetailPage({ params }: PageProps) {
     }
 
     return (
-      <div className={`${layout.containerClass} ${styles.mediaBlock}`}>
-        {layout.id === 'layout3' ? (
-          <div className={styles.twoCol60_40FullHeightGrid}>
-            {mediaSources.map((src, index) => (
-              <div key={index} className={styles.twoCol60_40FullHeightCol}>
-                {renderMediaItem(src, index)}
-              </div>
-            ))}
-            {mediaSources.length < 2 && (
-              <div className={styles.twoCol60_40FullHeightCol}>
-                {renderMediaItem(undefined, mediaSources.length)}
-              </div>
-            )}
-          </div>
-        ) : layout.id === 'layout4' ? (
-          <div className={styles.twoCol40_60MediumHeightGrid}>
-            {mediaSources.map((src, index) => (
-              <div 
-                key={index} 
-                className={index === 0 
-                  ? styles.twoCol40_60MediumHeightCol 
-                  : `${styles.twoCol40_60MediumHeightCol} ${styles.twoCol40_60MediumHeightRightCol}`
-                }
-              >
-                {renderMediaItem(src, index)}
-              </div>
-            ))}
-            {mediaSources.length < 2 && (
-              <div className={styles.twoCol40_60MediumHeightCol}>
-                {renderMediaItem(undefined, mediaSources.length)}
-              </div>
-            )}
-          </div>
-        ) : layout.id === 'layout5' ? (
-          <div className={styles.twoCol60_40MediumHeightGrid}>
-            {mediaSources.map((src, index) => (
-              <div 
-                key={index} 
-                className={index === 0 
-                  ? `${styles.twoCol60_40MediumHeightCol} ${styles.twoCol60_40MediumHeightLeftCol}`
-                  : styles.twoCol60_40MediumHeightCol
-                }
-              >
-                {renderMediaItem(src, index)}
-              </div>
-            ))}
-            {mediaSources.length < 2 && (
-              <div className={styles.twoCol60_40MediumHeightCol}>
-                {renderMediaItem(undefined, mediaSources.length)}
-              </div>
-            )}
-          </div>
-        ) : layout.id === 'layout1' ? (
-          <div className={styles.fullHeightImageContainer}>
+      <div className={styles.mediaBlockContainer}>
+        {layout.id === 'layout1' ? (
+          <div className={styles.fullHeightContainer}>
             {renderMediaItem(mediaSources[0], 0)}
           </div>
         ) : layout.id === 'layout2' ? (
-          <div className={styles.autoHeightImageContainer}>
+          <div className={styles.autoHeightContainer}>
+            {renderMediaItem(mediaSources[0], 0)}
+          </div>
+        ) : layout.id === 'layout3' ? (
+          <div className={styles.twoColumnContainer}>
+            <div className={styles.twoColumn60_40}>
+              <div className={styles.column60}>
+                {renderMediaItem(mediaSources[0], 0)}
+              </div>
+              <div className={styles.column40}>
+                {renderMediaItem(mediaSources[1], 1)}
+              </div>
+            </div>
+          </div>
+        ) : layout.id === 'layout4' ? (
+          <div className={styles.twoColumnContainer}>
+            <div className={styles.twoColumn40_60}>
+              <div className={styles.column40}>
+                {renderMediaItem(mediaSources[0], 0)}
+              </div>
+              <div className={styles.column60_offset}>
+                {renderMediaItem(mediaSources[1], 1)}
+              </div>
+            </div>
+          </div>
+        ) : layout.id === 'layout5' ? (
+          <div className={styles.twoColumnContainer}>
+            <div className={styles.twoColumn60_40}>
+              <div className={styles.column60_offset}>
+                {renderMediaItem(mediaSources[0], 0)}
+              </div>
+              <div className={styles.column40}>
+                {renderMediaItem(mediaSources[1], 1)}
+              </div>
+            </div>
+          </div>
+        ) : layout.id === 'layout6' ? (
+          <div className={styles.videoContainer}>
             {renderMediaItem(mediaSources[0], 0)}
           </div>
         ) : (
@@ -363,11 +358,52 @@ export default function WorkDetailPage({ params }: PageProps) {
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className={styles.loadingContainer}
+            initial={{ y: '100%' }}
+            animate={{ 
+              y: isReady ? '-100%' : '0%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+            exit={{ 
+              y: '-100%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+          >
+            <motion.div 
+              className={styles.loadingContent}
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: 1,
+                transition: { delay: 0.3, duration: 0.8 }
+              }}
+              exit={{ 
+                opacity: 0,
+                transition: { duration: 0.6 }
+              }}
+            >
+              <Image
+                src="/minilogo.svg"
+                alt="Gothe Architects Logo"
+                width={120}
+                height={40}
+                className={styles.loadingLogo}
+                priority
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   }
 
@@ -396,175 +432,238 @@ export default function WorkDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className={styles.pageContainer}>
-      <div className={styles.topSpacer}></div>
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className={styles.loadingContainer}
+            initial={{ y: '100%' }}
+            animate={{ 
+              y: isReady ? '-100%' : '0%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+            exit={{ 
+              y: '-100%',
+              transition: {
+                duration: 1.2,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+          >
+            <motion.div 
+              className={styles.loadingContent}
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: 1,
+                transition: { delay: 0.3, duration: 0.8 }
+              }}
+              exit={{ 
+                opacity: 0,
+                transition: { duration: 0.6 }
+              }}
+            >
+              <Image
+                src="/minilogo.svg"
+                alt="Gothe Architects Logo"
+                width={120}
+                height={40}
+                className={styles.loadingLogo}
+                priority
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className={styles.contentWrapper}>
-        <div className={styles.leftSection}>
-          <div className={styles.stickyContainer}>
-            <Link href="/gohte-architects/works" className={styles.backButton}>
-              <svg className={styles.backIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className={styles.backText}>BACK TO WORKS</span>
-            </Link>
+      <motion.div
+        className={styles.pageContainer}
+        initial={{ opacity: 0 }}
+        animate={{ 
+          opacity: isLoading ? 0 : 1,
+          transition: { 
+            duration: 1,
+            delay: 0.8,
+            ease: "easeOut"
+          }
+        }}
+      >
+        <div className={styles.topSpacer}></div>
 
-            <h1 className={styles.workTitle}>{work.name}</h1>
+        <div className={styles.contentWrapper}>
+          <div className={styles.leftSection}>
+            <div className={styles.stickyContainer}>
+              <Link href="/gohte-architects/works" className={styles.backButton}>
+                <svg className={styles.backIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className={styles.backText}>BACK TO WORKS</span>
+              </Link>
 
-            <div className={styles.creditsSection}>
-              <h2 className={styles.creditsTitle}>CREDITS</h2>
-              <div className={styles.creditsGrid}>
-                <div className={styles.creditColumn}>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Location</p>
-                    <p className={styles.creditValue}>{work.location || '-'}</p>
-                  </div>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Completion Year</p>
-                    <p className={styles.creditValue}>{work.completion_year || '-'}</p>
-                  </div>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Area</p>
-                    <p className={styles.creditValue}>{work.area || '-'}</p>
-                  </div>
-                </div>
+              <h1 className={styles.workTitle}>{work.name}</h1>
 
-                <div className={styles.creditColumn}>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Architects</p>
-                    <p className={styles.creditValue}>{work.architects || '-'}</p>
+              <div className={styles.creditsSection}>
+                <h2 className={styles.creditsTitle}>CREDITS</h2>
+                <div className={styles.creditsGrid}>
+                  <div className={styles.creditColumn}>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Location</p>
+                      <p className={styles.creditValue}>{work.location || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Completion Year</p>
+                      <p className={styles.creditValue}>{work.completion_year || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Area</p>
+                      <p className={styles.creditValue}>{work.area || '-'}</p>
+                    </div>
                   </div>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Interior Designer</p>
-                    <p className={styles.creditValue}>{work.interior_designer || '-'}</p>
-                  </div>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Principal</p>
-                    <p className={styles.creditValue}>{work.principal || '-'}</p>
-                  </div>
-                </div>
 
-                <div className={styles.creditColumn}>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Other Participants</p>
-                    <p className={styles.creditValue}>{work.other_participants || '-'}</p>
+                  <div className={styles.creditColumn}>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Architects</p>
+                      <p className={styles.creditValue}>{work.architects || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Interior Designer</p>
+                      <p className={styles.creditValue}>{work.interior_designer || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Principal</p>
+                      <p className={styles.creditValue}>{work.principal || '-'}</p>
+                    </div>
                   </div>
-                  <div className={styles.creditItem}>
-                    <p className={styles.creditLabel}>Photography</p>
-                    <p className={styles.creditValue}>{work.photography || '-'}</p>
+
+                  <div className={styles.creditColumn}>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Other Participants</p>
+                      <p className={styles.creditValue}>{work.other_participants || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}>
+                      <p className={styles.creditLabel}>Photography</p>
+                      <p className={styles.creditValue}>{work.photography || '-'}</p>
+                    </div>
+                    <div className={styles.creditItem}></div>
                   </div>
-                  <div className={styles.creditItem}></div>
                 </div>
               </div>
+
+              <Link href="/gohte-architects/contact" className={styles.getQuoteButton}>
+                <span className={styles.buttonText}>GET QUOTE</span>
+              </Link>
             </div>
-
-            <Link href="/gohte-architects/contact" className={styles.getQuoteButton}>
-              <span className={styles.buttonText}>GET QUOTE</span>
-            </Link>
           </div>
-        </div>
 
-        <div className={styles.rightSection}>
-          <div className={styles.contentContainer}>
-            {blocks.map((block) => {
-              if (block.type === 'text') {
-                return (
-                  <div key={block.id} className={styles.textBlock}>
-                    {editor && <EditorContent editor={editor} />}
-                  </div>
-                );
-              } else if (block.type === 'image' || block.type === 'video') {
-                return (
-                  <div key={block.id} className={styles.mediaBlockWrapper}>
-                    <MediaBlock block={block} />
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.middleSection}>
-        <div className={styles.logoContainer}>
-          <Image
-            src="/minilogo.svg"
-            alt="Company Logo"
-            width={120}
-            height={40}
-            className={styles.logo}
-          />
-        </div>
-      </div>
-
-      <div className={styles.bottomSection}>
-        <div className={styles.bottomLeftSection}>
-          <h2 className={styles.exploreTitle}>EXPLORE</h2>
-          <p className={styles.exploreSubtitle}>Other related works you might like</p>
-        </div>
-
-        <div className={styles.bottomRightSection}>
-          <div className={styles.sliderWrapper}>
-            <div className={styles.sliderTrack} ref={sliderRef}>
-              {relatedWorks.map((relatedWork, index) => (
-                <div 
-                  key={relatedWork.id} 
-                  className={styles.slide}
-                  style={{ 
-                    transform: `translateX(-${currentSlide * 100}%)`,
-                    width: `${100 / (isMobile ? 1 : 2)}%`
-                  }}
-                >
-                  <Link href={`/gohte-architects/work/${relatedWork.id}`} className={styles.relatedWorkCard}>
-                    <div className={styles.workInfoContainer}>
-                      <span className={styles.workNumber}>
-                        {(index + 1).toString().padStart(2, '0')} / {relatedWork.name}
-                      </span>
-                    </div>
-                    <div className={styles.relatedImageContainer}>
-                      <Image
-                        src={relatedWork.main_image || '/placeholder-project.svg'}
-                        alt={relatedWork.name}
-                        fill
-                        className={styles.relatedImage}
-                        quality={90}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <div className={styles.imageOverlay}>
-                        <span className={styles.viewWorkText}>VIEW WORK</span>
+          <div className={styles.rightSection}>
+            <div className={styles.contentContainer}>
+              {blocks.map((block) => {
+                if (block.type === 'text') {
+                  return (
+                    <div key={block.id} className={styles.textBlockContainer}>
+                      <div className={styles.textBlock}>
+                        <div 
+                          className={styles.editor}
+                          dangerouslySetInnerHTML={{ __html: block.content }}
+                        />
                       </div>
                     </div>
-                  </Link>
-                </div>
-              ))}
+                  );
+                } else if (block.type === 'image' || block.type === 'video') {
+                  return (
+                    <div key={block.id} className={styles.mediaBlockWrapper}>
+                      <MediaBlock block={block} />
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           </div>
+        </div>
 
-          <div className={styles.sliderControls}>
-            <button 
-              className={styles.sliderButton} 
-              onClick={prevSlide}
-              aria-label="Previous work"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            <button 
-              className={styles.sliderButton} 
-              onClick={nextSlide}
-              aria-label="Next work"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+        <div className={styles.middleSection}>
+          <div className={styles.logoContainer}>
+            <Image
+              src="/minilogo.svg"
+              alt="Company Logo"
+              width={120}
+              height={40}
+              className={styles.logo}
+            />
           </div>
         </div>
-      </div>
 
-      <div className={styles.bottomSpacer}></div>
-    </div>
+        <div className={styles.bottomSection}>
+          <div className={styles.bottomLeftSection}>
+            <h2 className={styles.exploreTitle}>EXPLORE</h2>
+            <p className={styles.exploreSubtitle}>Other related works you might like</p>
+          </div>
+
+          <div className={styles.bottomRightSection}>
+            <div className={styles.sliderWrapper}>
+              <div className={styles.sliderTrack} ref={sliderRef}>
+                {relatedWorks.map((relatedWork, index) => (
+                  <div 
+                    key={relatedWork.id} 
+                    className={styles.slide}
+                    style={{ 
+                      transform: `translateX(-${currentSlide * 100}%)`,
+                      width: `${100 / (isMobile ? 1 : 2)}%`
+                    }}
+                  >
+                    <Link href={`/gohte-architects/work/${relatedWork.id}`} className={styles.relatedWorkCard}>
+                      <div className={styles.workInfoContainer}>
+                        <span className={styles.workNumber}>
+                          {(index + 1).toString().padStart(2, '0')} / {relatedWork.name}
+                        </span>
+                      </div>
+                      <div className={styles.relatedImageContainer}>
+                        <Image
+                          src={relatedWork.main_image || '/placeholder-project.svg'}
+                          alt={relatedWork.name}
+                          fill
+                          className={styles.relatedImage}
+                          quality={90}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                        <div className={styles.imageOverlay}>
+                          <span className={styles.viewWorkText}>VIEW WORK</span>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              
+              <div className={styles.sliderControls}>
+                <button 
+                  className={styles.sliderButton} 
+                  onClick={prevSlide}
+                  aria-label="Previous work"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <button 
+                  className={styles.sliderButton} 
+                  onClick={nextSlide}
+                  aria-label="Next work"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.bottomSpacer}></div>
+      </motion.div>
+    </>
   );
 }

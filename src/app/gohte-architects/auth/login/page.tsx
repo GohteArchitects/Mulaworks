@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,57 +26,68 @@ export default function LoginPage() {
         throw error;
       }
 
-      // Jika login berhasil, redirect ke admin
       router.push('/gohte-architects/admin');
     } catch (err: any) {
-      setError(err.message || 'Login gagal. Coba lagi.');
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6">Admin Login</h1>
+    <div className={styles.pageContainer}>
+      <div className={styles.loginWrapper}>
+        <div className={styles.loginBackground}></div>
+        <div className={styles.loginOverlay}></div>
         
-        {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
+        <div className={styles.loginContainer}>
+          <div className={styles.loginHeader}>
+            <h1 className={styles.loginTitle}>Admin Portal</h1>
+            <p className={styles.loginSubtitle}>Enter your credentials to access the admin dashboard</p>
           </div>
 
-          <div className="mb-6">
-            <label className="block mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
+          {error && (
+            <div className={styles.errorMessage}>
+              {error}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
-          >
-            {loading ? 'Loading...' : 'Login'}
-          </button>
-        </form>
+          <form onSubmit={handleLogin} className={styles.loginForm}>
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.formLabel}>Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.formInput}
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="password" className={styles.formLabel}>Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.formInput}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={styles.submitButton}
+            >
+              <span className={styles.buttonText}>
+                {loading ? 'Authenticating...' : 'Login'}
+              </span>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

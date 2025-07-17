@@ -17,19 +17,9 @@ interface Work {
   main_image?: string;
 }
 
-interface SupabaseWork {
-  id: string;
-  name: string;
-  type: 'Residential' | 'Commercial';
-  location: string;
-  completion_year: number;
-  description?: string;
-  main_image?: string;
-}
-
 export default function WorkGalleryPage() {
   const [works, setWorks] = useState<Work[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,7 +34,7 @@ export default function WorkGalleryPage() {
     }, 1200);
 
     const transitionTimer = setTimeout(() => {
-      setLoading(false);
+      setIsLoading(false);
     }, 2000);
 
     async function fetchWorks() {
@@ -52,7 +42,7 @@ export default function WorkGalleryPage() {
         const data = await getWorks();
         if (!data) throw new Error("No data returned");
         
-        const mappedData: Work[] = data.map((work: SupabaseWork) => ({
+        const mappedData: Work[] = data.map((work: Work) => ({
           ...work,
           main_image: work.main_image || '/placeholder-image.jpg'
         }));
@@ -62,8 +52,6 @@ export default function WorkGalleryPage() {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error occurred";
         setError(`Failed to load projects: ${message}`);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -127,7 +115,7 @@ export default function WorkGalleryPage() {
   return (
     <>
       <AnimatePresence>
-        {loading && (
+        {isLoading && (
           <motion.div
             className={styles.loadingContainer}
             initial={{ y: '100%' }}
@@ -175,7 +163,7 @@ export default function WorkGalleryPage() {
         className={styles.pageContainer}
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: loading ? 0 : 1,
+          opacity: isLoading ? 0 : 1,
           transition: { 
             duration: 1,
             delay: 0.8,
@@ -183,25 +171,28 @@ export default function WorkGalleryPage() {
           }
         }}
       >
+        <div className={styles.topSpacer}></div>
+
         <div className={styles.contentWrapper}>
-          <div className={styles.leftColumn}>
-            <div className={styles.stickyContainer}>
+          {/* Left Column - Sticky */}
+          <div className={styles.leftColumnStickyContainer}>
+            <div className={styles.leftColumn}>
               <div className={styles.filterSection}>
                 <div className={styles.searchContainer}>
+                  <input
+                    type="text"
+                    placeholder="SEARCH"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className={styles.searchInput}
+                    aria-label="Search projects"
+                  />
                   <div className={styles.searchIcon}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#161616" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       <path d="M21 21L16.65 16.65" stroke="#161616" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    className={styles.searchInput}
-                    aria-label="Search projects"
-                  />
                 </div>
               </div>
 
@@ -210,26 +201,25 @@ export default function WorkGalleryPage() {
                   <h2 className={styles.projectTitle}>{hoveredWork.name}</h2>
                   <div className={styles.detailsRow}>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Location:</span>
+                      <span className={styles.detailLabel}>Location</span>
                       <span className={styles.detailValue}>{hoveredWork.location}</span>
                     </div>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Year:</span>
+                      <span className={styles.detailLabel}>Year</span>
                       <span className={styles.detailValue}>{hoveredWork.completion_year}</span>
                     </div>
                   </div>
                   <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Description:</span>
-                    <p className={styles.detailValue}>{hoveredWork.description || 'No description available'}</p>
+                    <p className={styles.detailValueDesc}>{hoveredWork.description || 'No description available'}</p>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className={styles.rightColumn}>
+          {/* Right Column - Scrollable */}
+          <div className={styles.rightColumnScrollable}>
             <div className={styles.workTypesContainer}>
-              <h3 className={styles.listTitle}>Work Types</h3>
               <div className={styles.listHorizontal}>
                 <button 
                   onClick={() => handleCategoryChange('All')}
@@ -273,6 +263,9 @@ export default function WorkGalleryPage() {
                           priority={currentWorks.indexOf(work) < 4}
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
+                        <div className={styles.imageOverlay}>
+                          <span className={styles.viewText}>VIEW WORK</span>
+                        </div>
                       </div>
                     </Link>
                   </motion.div>
