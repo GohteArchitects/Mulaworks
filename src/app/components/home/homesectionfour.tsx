@@ -44,7 +44,7 @@ const HomeSectionFour = () => {
       <div className={styles.rightColumn}>
         {/* Row 1 */}
         <div className={styles.imageRow}>
-          <Link href="/gohte-architects/works" className={`${styles.imageBlock} ${styles.image40}`}>
+          <Link href="/gohte-architects/work/0566861a-aea2-4f38-9bbe-45b884ab3834" className={`${styles.imageBlock} ${styles.image40}`}>
             <div className={styles.imageLabel}>{works[0].title}</div>
             <div className={styles.imageWrapper}>
               <div className={styles.imageContainer}>
@@ -59,7 +59,7 @@ const HomeSectionFour = () => {
               </div>
             </div>
           </Link>
-          <Link href="/gohte-architects/works" className={`${styles.imageBlock} ${styles.image60} ${styles.offsetTop}`}>
+          <Link href="/gohte-architects/work/6407e2f4-efd4-4a0d-960d-b831e410de89" className={`${styles.imageBlock} ${styles.image60} ${styles.offsetTop}`}>
             <div className={styles.imageLabel}>{works[1].title}</div>
             <div className={styles.imageWrapper}>
               <div className={styles.imageContainer}>
@@ -77,7 +77,7 @@ const HomeSectionFour = () => {
         
         {/* Row 2 - Full width */}
         <div className={styles.imageRow}>
-          <Link href="/gohte-architects/works" className={`${styles.imageBlock} ${styles.image100}`}>
+          <Link href="/gohte-architects/work/6e5c5ed3-a1f9-4016-b655-b26f63806c47" className={`${styles.imageBlock} ${styles.image100}`}>
             <div className={styles.imageLabel}>{works[2].title}</div>
             <div className={styles.imageWrapper}>
               <div className={styles.imageContainer}>
@@ -95,7 +95,7 @@ const HomeSectionFour = () => {
         
         {/* Row 3 */}
         <div className={styles.imageRow}>
-          <Link href="/gohte-architects/works" className={`${styles.imageBlock} ${styles.image60} ${styles.offsetBottom}`}>
+          <Link href="/gohte-architects/work/f3bb5770-8a04-492b-a64b-a23bf8f77c7a" className={`${styles.imageBlock} ${styles.image60} ${styles.offsetBottom}`}>
             <div className={styles.imageLabel}>{works[3].title}</div>
             <div className={styles.imageWrapper}>
               <div className={styles.imageContainer}>
@@ -109,7 +109,7 @@ const HomeSectionFour = () => {
               </div>
             </div>
           </Link>
-          <Link href="/gohte-architects/works" className={`${styles.imageBlock} ${styles.image40}`}>
+          <Link href="/gohte-architects/work/f5088559-2e5b-4129-8723-07664ab40795" className={`${styles.imageBlock} ${styles.image40}`}>
             <div className={styles.imageLabel}>{works[4].title}</div>
             <div className={styles.imageWrapper}>
               <div className={styles.imageContainer}>
