@@ -1018,7 +1018,7 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Architects (comma-separated)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Architects</label>
                     <input
                       type="text"
                       value={selectedWork.architects || ''}
@@ -1027,11 +1027,11 @@ export default function AdminPage() {
                         setHasChanges(true);
                       }}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="e.g., John Doe, Jane Smith"
+                      placeholder=""
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Other Participants (comma-separated)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Other Participants</label>
                     <input
                       type="text"
                       value={selectedWork.other_participants || ''}
@@ -1040,11 +1040,11 @@ export default function AdminPage() {
                         setHasChanges(true);
                       }}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="e.g., Builder Co., Lighting Solutions"
+                      placeholder=""
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Photography By (comma-separated)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Photography By</label>
                     <input
                       type="text"
                       value={selectedWork.photography || ''}
@@ -1053,7 +1053,7 @@ export default function AdminPage() {
                         setHasChanges(true);
                       }}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="e.g., Photo Studio A, B Photography"
+                      placeholder=""
                     />
                   </div>
                   <div>
@@ -1066,7 +1066,7 @@ export default function AdminPage() {
                         setHasChanges(true);
                       }}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="e.g., 200 sq.m."
+                      placeholder=""
                     />
                   </div>
                   <div>
@@ -1104,7 +1104,7 @@ export default function AdminPage() {
                           setHasChanges(true);
                         }}
                         className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="e.g., https://yourdomain.com/image.jpg"
+                        placeholder="https://yourdomain.com/image.jpg"
                       />
                       <button
                         onClick={async () => {

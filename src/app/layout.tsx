@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'My Smooth Scrolling App',
-  description: 'A Next.js app with smooth scrolling and Inter font.',
+  title: 'Gohte Architects',
+  description: 'Indonesian Architects',
 };
 
 export default function RootLayout({
