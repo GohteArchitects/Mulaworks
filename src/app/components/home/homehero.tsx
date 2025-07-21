@@ -13,7 +13,7 @@ const HomeHero = () => {
   // Smooth follow effect with delay
   useEffect(() => {
     let animationFrameId: number;
-    const smoothingFactor = 0.1; // Adjust for more/less delay (0.05-0.2)
+    const smoothingFactor = 0.1;
     
     const animate = () => {
       setTargetPosition(prev => {
@@ -32,7 +32,6 @@ const HomeHero = () => {
     if (isHovering) {
       animationFrameId = requestAnimationFrame(animate);
     } else {
-      // Reset position when not hovering
       setTargetPosition(mousePosition);
     }
     
@@ -72,64 +71,66 @@ const HomeHero = () => {
   }, []);
 
   return (
-    <section className={styles.heroContainer} ref={heroRef}>
-      {/* Hover Effect Element */}
-      <div 
-        className={`${styles.heroHoverEffect} ${isHovering ? styles.visible : ''}`}
-        style={{
-          left: `${targetPosition.x}px`,
-          top: `${targetPosition.y}px`,
-        }}
-      >
-        <div className={styles.arrowUp}></div>
-        <span className={styles.viewWorkText}>View Work</span>
-      </div>
-
-      {/* Video Background */}
-      <div className={styles.videoContainer}>
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className={styles.video}
-          preload="auto"
+    <Link href="/gohte-architects/works" className={styles.heroLink}>
+      <section className={styles.heroContainer} ref={heroRef}>
+        {/* Hover Effect Element */}
+        <div 
+          className={`${styles.heroHoverEffect} ${isHovering ? styles.visible : ''}`}
+          style={{
+            left: `${targetPosition.x}px`,
+            top: `${targetPosition.y}px`,
+          }}
         >
-          <source src="/HomeHero.mp4" type="video/mp4" />
-        </video>
-        <div className={styles.videoOverlay}></div>
-      </div>
+          <div className={styles.arrowUp}></div>
+          <span className={styles.viewWorkText}>View Work</span>
+        </div>
 
-      {/* Top Row */}
-      <div className={styles.topRow}>
-        <div className={`${styles.column} ${styles.firstColumn}`}>
-          <span className={styles.columnText}>featured work</span>
+        {/* Video Background */}
+        <div className={styles.videoContainer}>
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className={styles.video}
+            preload="auto"
+          >
+            <source src="/HomeHero.mp4" type="video/mp4" />
+          </video>
+          <div className={styles.videoOverlay}></div>
         </div>
-        <div className={styles.column}>
-          <span className={styles.columnText}>2025</span>
-        </div>
-        <div className={styles.column}>
-          <span className={styles.columnText}>residental work</span>
-        </div>
-        <div className={`${styles.column} ${styles.lastColumn}`}>
-          <span className={styles.columnText}>01/ RA HOUSE</span>
-        </div>
-      </div>
 
-      {/* Center Text */}
-      <div className={styles.centerText}>
-        <h1 className={styles.mainHeading} aria-label="A breathing home">
-          a breathing home
-        </h1>
-      </div>
+        {/* Top Row */}
+        <div className={styles.topRow}>
+          <div className={`${styles.column} ${styles.firstColumn}`}>
+            <span className={styles.columnText}>featured work</span>
+          </div>
+          <div className={styles.column}>
+            <span className={styles.columnText}>2025</span>
+          </div>
+          <div className={styles.column}>
+            <span className={styles.columnText}>residental work</span>
+          </div>
+          <div className={`${styles.column} ${styles.lastColumn}`}>
+            <span className={styles.columnText}>01/ RA HOUSE</span>
+          </div>
+        </div>
 
-      {/* Bottom Left Text */}
-      <div className={styles.bottomText}>
-        <p className={styles.description}>
-          At Gohte Architects, we design clean, functional spaces that connect people with the natural environment.
-        </p>
-      </div>
-    </section>
+        {/* Center Text */}
+        <div className={styles.centerText}>
+          <h1 className={styles.mainHeading} aria-label="A breathing home">
+            a breathing home
+          </h1>
+        </div>
+
+        {/* Bottom Left Text */}
+        <div className={styles.bottomText}>
+          <p className={styles.description}>
+            At Gohte Architects, we design clean, functional spaces that connect people with the natural environment.
+          </p>
+        </div>
+      </section>
+    </Link>
   );
 };
 

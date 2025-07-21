@@ -7,6 +7,15 @@
   overflow: hidden;
 }
 
+.heroLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
 .videoContainer {
   position: absolute;
   top: 0;
@@ -168,7 +177,6 @@
   height: 120px;
   border-radius: 50%;
   background-color: transparent;
-  border: 1px solid white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -186,6 +194,8 @@
   letter-spacing: 1px;
   will-change: transform;
   backdrop-filter: blur(2px);
+    background-color: rgba(255, 255, 255, 0.2);
+
 }
 
 .heroHoverEffect.visible {
@@ -194,17 +204,28 @@
 }
 
 .arrowUp {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowUp::after {
+  content: "";
   width: 16px;
   height: 16px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  transition: transform 0.3s ease;
 }
 
 .viewWorkText {
   margin-top: 8px;
+  font-weight: 400;
+  font-size: 10px;
   transition: transform 0.3s ease;
 }
 
@@ -216,31 +237,75 @@
   transform: translateY(2px);
 }
 
-/* Responsive adjustments */
+/* Mobile Scaling - Mempertahankan layout desktop dengan scaling */
 @media (max-width: 768px) {
-  .topRow {
-    flex-direction: column;
+  .heroContainer {
     padding: 1rem;
   }
-  
-  .column {
-    margin-bottom: 0.5rem;
-    text-align: left;
-    padding: 0 !important;
-  }
-  
-  .mainHeading {
-    font-size: 8vw;
-    padding-left: 1rem;
-  }
-  
-  .bottomText {
-    max-width: 200px;
+
+  .topRow {
+    padding-top: 6rem;
+    width: 100%;
+    margin: 0;
+    font-size: 12px; /* Ukuran font lebih kecil */
   }
 
-  /* Disable hover effect on mobile */
+  .column{
+    padding: 0;
+  }
+
+  .mainHeading {
+    font-size: 3rem; /* Ukuran heading lebih kecil */
+    padding-left: 1rem;
+  }
+
+  .bottomText {
+    max-width: 250px; /* Lebih sempit */
+    left: 1rem;
+    bottom: 1.5rem;
+  }
+
+  .description {
+    font-size: 14px; /* Ukuran teks lebih kecil */
+  }
+
   .heroHoverEffect {
-    display: none;
+    width: 90px;
+    height: 90px;
+    font-size: 10px;
+  }
+
+  .arrowUp {
+    width: 30px;
+    height: 30px;
+  }
+
+  .arrowUp::after {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topRow {
+    font-size: 10px; /* Lebih kecil lagi untuk mobile sangat kecil */
+  }
+
+  .mainHeading {
+    font-size: 3rem;
+  }
+
+  .bottomText {
+    max-width: 300px;
+  }
+
+  .description {
+    font-size: 20px;
+  }
+
+  .heroHoverEffect {
+    width: 80px;
+    height: 80px;
   }
 }
 

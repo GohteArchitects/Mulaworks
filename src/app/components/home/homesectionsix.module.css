@@ -200,7 +200,36 @@
   transform: translateX(8px);
 }
 
-/* Responsive styles */
+.successMessage {
+  color: #2d8a39;
+  background-color: #f0fff4;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.errorMessage {
+  color: #c53030;
+  background-color: #fff5f5;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.errorInput {
+  border-color: #e53e3e !important;
+}
+
+.errorText {
+  color: #e53e3e;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 1024px) {
   .sectionContainer {
     padding: 3rem 2rem;
@@ -215,23 +244,42 @@
 
 @media (max-width: 768px) {
   .sectionContainer {
-    flex-direction: column;
+    flex-direction: column-reverse; /* This reverses the order */
     padding: 2rem 1.5rem;
     min-height: auto;
+    gap: 2rem;
   }
 
   .leftColumn,
   .rightColumn {
     width: 100%;
+    padding-right: 0;
   }
 
   .leftImage {
     margin-bottom: 2rem;
+    margin-top: 0;
+  }
+
+  .image {
+    height: auto;
+    max-height: 400px;
+  }
+
+  .contactLists {
+    flex-direction: row;
+    gap: 2rem;
+    flex-wrap: wrap;
   }
 
   .formRow {
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .sectionSubtitle {
+    font-size: 1.8rem;
+    line-height: 1.2;
   }
 }
 
@@ -241,6 +289,17 @@
   }
   
   .sectionSubtitle {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+  }
+
+  .contactLists {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 4rem;
   }
 }

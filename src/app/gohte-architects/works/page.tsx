@@ -174,7 +174,7 @@ export default function WorkGalleryPage() {
         <div className={styles.topSpacer}></div>
 
         <div className={styles.contentWrapper}>
-          {/* Left Column - Sticky */}
+          {/* Left Column - Hidden on mobile except search */}
           <div className={styles.leftColumnStickyContainer}>
             <div className={styles.leftColumn}>
               <div className={styles.filterSection}>
@@ -217,7 +217,7 @@ export default function WorkGalleryPage() {
             </div>
           </div>
 
-          {/* Right Column - Scrollable */}
+          {/* Right Column */}
           <div className={styles.rightColumnScrollable}>
             <div className={styles.workTypesContainer}>
               <div className={styles.listHorizontal}>
@@ -253,6 +253,7 @@ export default function WorkGalleryPage() {
                     transition={{ duration: 0.5 }}
                     onMouseEnter={() => handleWorkHover(work)}
                   >
+                    <div className={styles.mobileWorkTitle}>{work.name}</div>
                     <Link href={`/gohte-architects/work/${work.id}`} className={styles.workLink}>
                       <div className={styles.imageContainer}>
                         <Image
