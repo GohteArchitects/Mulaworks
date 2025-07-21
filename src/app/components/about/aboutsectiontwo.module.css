@@ -197,9 +197,7 @@
   }
 
   /* Touch device improvements */
-  html {
-    -webkit-overflow-scrolling: touch;
-  }
+  
 }
 
 /* For very small devices */
