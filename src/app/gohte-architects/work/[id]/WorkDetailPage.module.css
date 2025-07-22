@@ -833,7 +833,7 @@
 /* Extra small devices adjustment */
 @media (max-width: 400px) {
   .creditsGrid {
-    grid-template-columns: repeat(2, 1fr); /* Switch to 2 columns on very small screens */
+    grid-template-columns: repeat(3, 1fr); /* Switch to 2 columns on very small screens */
   }
   
   .workTitle {
