@@ -206,6 +206,10 @@
 
 /* Mobile Styles */
 @media (max-width: 768px) {
+  .footer{
+    padding: 4rem 1rem;
+    margin: 0;
+  }
   .container {
     flex-direction: column;
     gap: 0;
