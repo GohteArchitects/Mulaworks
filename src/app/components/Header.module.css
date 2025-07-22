@@ -311,7 +311,7 @@
 
   .menuColumn {
     width: 100% !important;
-    padding: 2rem 0;
+    padding: 1rem 0;
   }
 
   .menuColumn:last-child {
@@ -319,7 +319,7 @@
   }
 
   .menuTitle {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .navLink {
