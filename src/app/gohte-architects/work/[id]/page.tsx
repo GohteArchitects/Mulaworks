@@ -248,26 +248,28 @@ export default function WorkDetailPage({ params }: PageProps) {
     const renderMediaItem = (src: string | undefined, index: number) => {
       if (block.type === 'video' || layout.mediaType === 'video') {
         return (
-          <div className={styles.videoContainer}>
+          <div className={isMobile ? styles.mobileVideoContainer : styles.videoContainer}>
             {src?.includes('youtube.com') || src?.includes('youtu.be') ? (
               <iframe
                 src={`https://www.youtube.com/embed/${getYouTubeId(src)}`}
-                className={styles.videoIframe}
+                className={isMobile ? styles.mobileVideoIframe : styles.videoIframe}
                 allowFullScreen
                 title={`YouTube video ${index + 1}`}
+                loading="lazy"
               />
             ) : src?.includes('vimeo.com') ? (
               <iframe
                 src={`https://player.vimeo.com/video/${getVimeoId(src)}`}
-                className={styles.videoIframe}
+                className={isMobile ? styles.mobileVideoIframe : styles.videoIframe}
                 allowFullScreen
                 title={`Vimeo video ${index + 1}`}
+                loading="lazy"
               />
             ) : (
               <video 
                 src={src} 
                 controls 
-                className={styles.videoElement}
+                className={isMobile ? styles.mobileVideoElement : styles.videoElement}
               />
             )}
           </div>
@@ -275,18 +277,19 @@ export default function WorkDetailPage({ params }: PageProps) {
       }
 
       return (
-        <div className={styles.imageContainer}>
+        <div className={isMobile ? styles.mobileImageContainer : styles.imageContainer}>
           <Image
             src={src || '/placeholder-project.svg'}
             alt={`Image ${index + 1}`}
             fill
-            className={styles.imageElement}
-            quality={90}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={isMobile ? styles.mobileImageElement : styles.imageElement}
+            quality={isMobile ? 85 : 90}
+            sizes={isMobile ? "100vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = '/placeholder-project.svg';
             }}
+            priority={index === 0}
           />
         </div>
       );
