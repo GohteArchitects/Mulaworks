@@ -224,7 +224,6 @@
     margin-bottom: 2rem;
     order: 1;
     padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .logoContainer {
@@ -249,7 +248,6 @@
     padding: 0;
     padding-bottom: 2rem;
     margin-bottom: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .mobileOnlyTitle {
@@ -267,7 +265,6 @@
     padding: 0;
     padding-bottom: 2rem;
     margin-bottom: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   /* Row 4 - Follow */
@@ -276,14 +273,12 @@
     padding: 0;
     padding-bottom: 2rem;
     margin-bottom: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   /* Row 5 - Copyright notice */
   .rightRow2 {
     order: 5;
     padding: 2rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .copyrightNotice {
