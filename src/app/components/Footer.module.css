@@ -282,7 +282,7 @@
   /* Row 5 - Copyright notice */
   .rightRow2 {
     order: 5;
-    padding: 2rem 0;
+    padding: 0rem 0;
   }
 
   .copyrightNotice {
@@ -294,7 +294,7 @@
   .madeByMobile {
     display: block;
     order: 6;
-    padding: 2rem 0 0;
+    padding: 1.5rem 0 0;
     text-align: start;
     font-size: 0.7rem;
     color: #ffffff;
@@ -305,7 +305,20 @@
   .navLink {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    display: block;
+    display: inline-block; /* Changed from block to inline-block */
+    position: relative;
+  }
+
+  .navLink::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 5px;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+    display: block; /* Added for consistency */
   }
 
   /* Reset column paddings */
