@@ -364,6 +364,7 @@
 }
 
 @media (max-width: 768px) {
+
   .contactContainer {
     flex-direction: column;
     padding: 2rem 1.5rem;
@@ -392,25 +393,25 @@
   }
 
   .heroWrapper {
-    height: 40vh;
+    height: 30vh;
   }
 
   .heroContent h1 {
+    padding-top: 3rem;
     font-size: 36px;
-    display: none;
   }
 
   .heroContent p {
-    display: none;
     font-size: 14px;
   }
 }
 
 @media (max-width: 480px) {
   .contactContainer {
-    padding: 2rem 1rem;
     gap: 2rem;
-    padding-top: 4rem;
+    padding-top: 0rem;
+    padding-left: 0;
+    padding-right: 0;
     padding-bottom: 4rem;
   }
   
