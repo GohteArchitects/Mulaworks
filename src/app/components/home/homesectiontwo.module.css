@@ -106,13 +106,13 @@
   background-color: #D7A96D;
 }
 
-/* Mobile Responsive Styles */
+/* Mobile Responsive Styles - Improved Version */
 @media (max-width: 768px) {
   .sectionContainer {
     flex-direction: column;
-    padding: 4rem 1rem;
+    padding: 3rem 1rem; /* Padding yang lebih seimbang */
     min-height: auto;
-    margin-bottom: 0rem;
+    margin-bottom: 2rem; /* Menambahkan margin bottom untuk spacing */
   }
 
   .leftColumn,
@@ -122,33 +122,42 @@
   }
 
   .leftColumn {
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem; /* Spacing yang lebih konsisten */
   }
 
   .sectionTitle {
-    font-size: 14px;
-    margin-bottom: 1rem;
+    font-size: 13px; /* Sedikit lebih kecil untuk mobile */
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.5px; /* Meningkatkan keterbacaan */
   }
 
   .sectionSubtitle {
-    font-size: 24px;
-    line-height: 1.2;
+    font-size: 22px; /* Ukuran yang lebih optimal untuk mobile */
+    line-height: 1.3; /* Line height yang lebih longgar */
     max-width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.3px; /* Sedikit lebih ketat untuk mobile */
   }
 
   .rightText {
-    font-size: 18px;
-    line-height: 1.3;
+    font-size: 17px; /* Ukuran yang lebih mudah dibaca */
+    line-height: 1.4; /* Lebih longgar untuk keterbacaan */
     max-width: 100%;
     margin-bottom: 2rem;
+    letter-spacing: -0.2px;
   }
 
   .buttonContainer {
-    margin-top: 0rem;
+    margin-top: 0.5rem; /* Sedikit spacing atas */
+    padding-left: 0; /* Memastikan alignment kiri */
+  }
+
+  .learnMoreButton {
+    font-size: 14px; /* Sedikit lebih kecil untuk mobile */
   }
 
   .underlineAnimation {
-    left: 20px;
+    left: 18px; /* Penyesuaian posisi untuk ukuran font yang lebih kecil */
+    bottom: -2px; /* Posisi underline yang lebih baik */
   }
 }

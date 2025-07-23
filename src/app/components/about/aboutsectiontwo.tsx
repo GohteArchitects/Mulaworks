@@ -71,6 +71,7 @@ const AboutSectionTwo = () => {
                   height={imageSizes.leftFirst.height}
                   className={styles.image}
                   priority
+                  sizes="(max-width: 768px) 100vw, 40vw"
                 />
               </div>
             </div>
@@ -111,6 +112,7 @@ const AboutSectionTwo = () => {
                   height={imageSizes.rightFirst.height}
                   className={styles.image}
                   priority
+                  sizes="(max-width: 768px) 100vw, 60vw"
                 />
               </div>
             </div>
@@ -139,6 +141,7 @@ const AboutSectionTwo = () => {
                     width={imageSizes.rightTeam.width}
                     height={imageSizes.rightTeam.height}
                     className={styles.image}
+                    sizes="(max-width: 768px) 100vw, 60vw"
                   />
                 </div>
                 <div className={styles.sliderControls}>

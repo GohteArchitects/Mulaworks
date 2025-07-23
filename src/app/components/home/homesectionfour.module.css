@@ -227,7 +227,7 @@
 @media (max-width: 768px) {
   .sectionContainer {
     flex-direction: column;
-    padding: 0rem 1.5rem 4rem;
+    padding: 0rem 1.5rem 0rem;
     min-height: auto;
     gap: 4rem;
   }
@@ -320,7 +320,7 @@
 /* Small Mobile Adjustments (below 480px) */
 @media (max-width: 480px) {
   .sectionContainer {
-    padding: 0rem 1rem 4rem;
+    padding: 0rem 1rem 0rem;
   }
 
   .imageWrapper {
