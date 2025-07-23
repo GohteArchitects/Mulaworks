@@ -139,37 +139,68 @@
   transform: translateX(8px);
 }
 
-/* Responsive Styles */
+/* Mobile styles only - Desktop tetap sama seperti sebelumnya */
 @media (max-width: 768px) {
+
+  .section{
+    padding: 2rem 1rem;
+  }
   .grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
+    min-height: auto;
+    gap: 2rem;
   }
 
   .column1Row1 {
     grid-column: 1;
     grid-row: 1;
-    height: 0;
-    padding-bottom: 0;
+    height: auto;
+    padding: 0;
+    display: none; /* Sembunyikan kolom kosong di mobile */
   }
 
   .column2Row1 {
     grid-column: 1;
     grid-row: 2;
+    height: auto;
+    padding: 0;
+    aspect-ratio: 4/3; /* Memberikan rasio aspek yang konsisten */
   }
 
   .column1Row2 {
     grid-column: 1;
     grid-row: 3;
+    height: auto;
+    padding: 0;
+    aspect-ratio: 4/3; /* Memberikan rasio aspek yang konsisten */
   }
 
   .column2Row2 {
     grid-column: 1;
     grid-row: 4;
-    padding: 2rem 1rem;
+    height: auto;
+    padding: 2rem 0rem;
+    justify-content: center;
+  }
+
+  .imageContainer {
+    min-height: 250px; /* Tinggi minimum yang reasonable untuk mobile */
   }
 
   .title {
     font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+  }
+
+  .contactButton {
+    width: 100%; /* Button full width di mobile */
+    max-width: 200px; /* Tapi tetap ada batas maksimum */
   }
 }

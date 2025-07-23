@@ -73,17 +73,48 @@
   white-space: pre-line;
 }
 
-/* Responsive adjustments */
+/* Mobile styles only - Desktop remains unchanged */
 @media (max-width: 768px) {
+  .section {
+    margin-top: 6rem;
+  }  
+
+  .textContent {
+    padding: 2rem 1rem 0;
+  }
+
   .title {
-    font-size: 2rem;
+    font-size: 16px;
+    margin-bottom: 0.8rem;
   }
-  
+
   .subtitle {
-    font-size: 1rem;
+    font-size: 24px;
+    line-height: 1.1;
   }
-  
+
+  .fullWidthImage {
+    height: 100%;
+    padding: 0 1rem;
+  }
+
+  .logoContainer {
+    min-height: 10vh;
+    padding: 1rem;
+  }
+
+  .logo {
+    width: 50px;
+    height: 40px;
+    margin-bottom: 1.5rem;
+  }
+
   .logoText {
-    font-size: 1rem;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    white-space: normal;
+    margin-bottom: 2rem;
   }
 }
+
