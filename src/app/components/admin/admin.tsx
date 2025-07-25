@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -8,7 +8,9 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import { ImageLayoutExtension } from '../../../lib/extensions';
 import { getPageContent, updatePageContent, uploadImage, getWorks, createWork, updateWork } from '@/lib/supabase';
-import { PlusCircle, ArrowUp, ArrowDown, Trash2, X, Type, Image as ImageIcon, Search, Video, FileText, Layout } from 'lucide-react';
+import { PlusCircle, ArrowUp, ArrowDown, Trash2, X, Type, Image as ImageIcon, Search, Video, FileText, Layout, Save } from 'lucide-react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type ContentBlock = {
   id: string;
@@ -25,61 +27,74 @@ type ImageLayout = {
   containerClass: string;
   imageClass: string;
   mediaType?: 'image' | 'video';
+  columnClasses?: string[]; // For multi-column layouts
 };
 
 const IMAGE_LAYOUTS: ImageLayout[] = [
   {
     id: 'layout1',
-    name: 'Normal',
-    description: 'Single image with padding',
+    name: 'Full Height',
+    description: 'Single image with 100vh height',
     columns: 1,
-    containerClass: 'w-full grid grid-cols-10 gap-4 p-0',
-    imageClass: 'w-full h-auto',
+    containerClass: 'w-full h-screen min-h-[500px] max-h-[800px] overflow-hidden',
+    imageClass: 'w-full h-full object-cover',
     mediaType: 'image'
   },
   {
     id: 'layout2',
-    name: 'Full Bleed',
-    description: 'Edge to edge image',
+    name: 'Auto Height',
+    description: 'Single image with auto height',
     columns: 1,
-    containerClass: 'w-full',
-    imageClass: 'w-full h-auto',
+    containerClass: 'w-full aspect-[16/9] max-h-[70vh] overflow-hidden',
+    imageClass: 'w-full h-full object-cover',
     mediaType: 'image'
   },
   {
     id: 'layout3',
-    name: '2 Columns Equal',
-    description: '50/50 split',
+    name: '2 Columns (60/40) Full Height',
+    description: '60/40 split with 100vh height',
     columns: 2,
-    containerClass: 'w-full grid-full grid-cols-2 gap-4 p-0',
-    imageClass: 'w-full h-auto',
-    mediaType: 'image'
+    containerClass: 'w-full h-screen min-h-[500px] max-h-screen flex gap-4',
+    imageClass: 'w-full h-full object-cover',
+    mediaType: 'image',
+    columnClasses: [
+      'w-[60%] h-full',
+      'w-[40%] h-[80%]'
+    ]
   },
   {
     id: 'layout4',
-    name: '2 Columns (70/30)',
-    description: 'Wider left image',
+    name: '2 Columns (40/60) Medium Height',
+    description: '40/60 split with 70% height',
     columns: 2,
-    containerClass: 'w-full grid-full grid-cols-10 gap-4 p-0',
-    imageClass: 'w-full h-auto',
-    mediaType: 'image'
+    containerClass: 'w-full h-screen min-h-[600px] flex gap-4',
+    imageClass: 'w-full h-full object-cover',
+    mediaType: 'image',
+    columnClasses: [
+      'w-[40%] h-full',
+      'w-[60%] h-full mt-[10vh]'
+    ]
   },
   {
     id: 'layout5',
-    name: '2 Columns (30/70)',
-    description: 'Wider right image',
+    name: '2 Columns (60/40) Medium Height',
+    description: '60/40 split with 70% height',
     columns: 2,
-    containerClass: 'w-full grid-full grid-cols-10 gap-4 p-0',
-    imageClass: 'w-full h-auto',
-    mediaType: 'image'
+    containerClass: 'w-full h-screen min-h-[600px] flex gap-4',
+    imageClass: 'w-full h-full object-cover',
+    mediaType: 'image',
+    columnClasses: [
+      'w-[60%] h-full mt-[10vh]',
+      'w-[40%] h-full'
+    ]
   },
   {
     id: 'layout6',
     name: 'Video Block',
     description: 'Embed a video',
     columns: 1,
-    containerClass: 'w-full my-4 aspect-video',
-    imageClass: 'w-full h-full object-cover',
+    containerClass: 'w-full aspect-video max-h-[70vh] bg-black overflow-hidden',
+    imageClass: 'w-full h-full object-contain',
     mediaType: 'video'
   }
 ];
@@ -94,53 +109,27 @@ const cleanHtmlContent = (html: string) => {
 const EditorToolbar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
 
-  return (
-    <div className="flex flex-wrap items-center gap-1 p-2 border-b">
-      <button
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-2 rounded hover:bg-gray-100 ${
-          editor.isActive('bold') ? 'bg-gray-200' : ''
-        }`}
-        title="Bold"
-      >
-        <Type className="w-4 h-4" strokeWidth={editor.isActive('bold') ? 3 : 2} />
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-2 rounded hover:bg-gray-100 ${
-          editor.isActive('italic') ? 'bg-gray-200' : ''
-        }`}
-        title="Italic"
-      >
-        <i className="text-sm italic">I</i>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`p-2 rounded hover:bg-gray-100 ${
-          editor.isActive('underline') ? 'bg-gray-200' : ''
-        }`}
-        title="Underline"
-      >
-        <u className="text-sm">U</u>
-      </button>
-      <button
-        onClick={() => {
-          const previousUrl = editor.getAttributes('link').href;
-          const url = window.prompt('Enter URL', previousUrl);
-
-          if (url === null) return;
-          if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run();
-            return;
-          }
-
-          editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-        }}
-        className={`p-2 rounded hover:bg-gray-100 ${
-          editor.isActive('link') ? 'bg-gray-200' : ''
-        }`}
-        title="Link"
-      >
+  const toolbarItems = [
+    {
+      icon: <Type className="w-4 h-4" strokeWidth={editor.isActive('bold') ? 3 : 2} />,
+      action: () => editor.chain().focus().toggleBold().run(),
+      active: editor.isActive('bold'),
+      title: "Bold"
+    },
+    {
+      icon: <i className="text-sm italic">I</i>,
+      action: () => editor.chain().focus().toggleItalic().run(),
+      active: editor.isActive('italic'),
+      title: "Italic"
+    },
+    {
+      icon: <u className="text-sm">U</u>,
+      action: () => editor.chain().focus().toggleUnderline().run(),
+      active: editor.isActive('underline'),
+      title: "Underline"
+    },
+    {
+      icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -155,83 +144,121 @@ const EditorToolbar = ({ editor }: { editor: any }) => {
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
-      </button>
-      <div className="flex items-center gap-1 ml-2">
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
-          className={`p-2 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'left' }) ? 'bg-gray-200' : ''
-          }`}
-          title="Align Left"
+      ),
+      action: () => {
+        const previousUrl = editor.getAttributes('link').href;
+        const url = window.prompt('Enter URL', previousUrl);
+
+        if (url === null) return;
+        if (url === '') {
+          editor.chain().focus().extendMarkRange('link').unsetLink().run();
+          return;
+        }
+
+        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+      },
+      active: editor.isActive('link'),
+      title: "Link"
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="6" x2="15" y2="6" />
-            <line x1="3" y1="18" x2="15" y2="18" />
-          </svg>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
-          className={`p-2 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'center' }) ? 'bg-gray-200' : ''
-          }`}
-          title="Align Center"
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="15" y2="6" />
+          <line x1="3" y1="18" x2="15" y2="18" />
+        </svg>
+      ),
+      action: () => editor.chain().focus().setTextAlign('left').run(),
+      active: editor.isActive({ textAlign: 'left' }),
+      title: "Align Left"
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="12" x2="6" y2="12" />
-            <line x1="21" y1="6" x2="3" y2="6" />
-            <line x1="21" y1="18" x2="3" y2="18" />
-          </svg>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
-          className={`p-2 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'right' }) ? 'bg-gray-200' : ''
-          }`}
-          title="Align Right"
+          <line x1="18" y1="12" x2="6" y2="12" />
+          <line x1="21" y1="6" x2="3" y2="6" />
+          <line x1="21" y1="18" x2="3" y2="18" />
+        </svg>
+      ),
+      action: () => editor.chain().focus().setTextAlign('center').run(),
+      active: editor.isActive({ textAlign: 'center' }),
+      title: "Align Center"
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="21" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="6" x2="9" y2="6" />
-            <line x1="21" y1="18" x2="9" y2="18" />
-          </svg>
+          <line x1="21" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="6" x2="9" y2="6" />
+          <line x1="21" y1="18" x2="9" y2="18" />
+        </svg>
+      ),
+      action: () => editor.chain().focus().setTextAlign('right').run(),
+      active: editor.isActive({ textAlign: 'right' }),
+      title: "Align Right"
+    }
+  ];
+
+  return (
+    <div className="flex flex-wrap items-center gap-1 p-2 border-b bg-gray-50 sticky top-0 z-10">
+      {toolbarItems.map((item, index) => (
+        <button
+          key={index}
+          onClick={item.action}
+          className={`p-2 rounded hover:bg-gray-200 transition-colors ${
+            item.active ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+          }`}
+          title={item.title}
+        >
+          {item.icon}
         </button>
-      </div>
+      ))}
     </div>
   );
 };
 
-function MediaBlock({ 
+const getYouTubeId = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const getVimeoId = (url: string) => {
+  const regExp = /^.*(vimeo.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/;
+  const match = url.match(regExp);
+  return match ? match[5] : null;
+};
+
+const MediaBlock = ({ 
   src, 
   layout = 'layout1',
   onChangeLayout,
@@ -243,138 +270,222 @@ function MediaBlock({
   onChangeLayout?: (layout: string) => void;
   onAddMedia?: (index?: number, currentMediaType?: 'image' | 'video') => void;
   mediaType?: 'image' | 'video';
-}) {
+}) => {
+  const [showLayoutMenu, setShowLayoutMenu] = useState(false);
   const currentLayout = IMAGE_LAYOUTS.find(l => l.id === layout) || IMAGE_LAYOUTS[0];
   const mediaSources = src ? src.split(',') : [];
   const emptySlots = currentLayout.columns - mediaSources.length;
 
-  const renderMediaSlot = (mediaSrc: string | undefined, index: number) => {
-    const aspectRatioClass = "aspect-video";
-    
+  const renderMediaItem = (mediaSrc: string | undefined, index: number) => {
     if (currentLayout.mediaType === 'video') {
-      const isYouTube = mediaSrc?.includes('youtube.com') || mediaSrc?.includes('youtu.be');
-      const isVimeo = mediaSrc?.includes('vimeo.com');
-
-      let embedSrc = mediaSrc;
-      if (isYouTube) {
-        const videoId = mediaSrc?.split('v=')[1]?.split('&')[0] || mediaSrc?.split('/').pop();
-        embedSrc = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1`;
-      } else if (isVimeo) {
-        const videoId = mediaSrc?.split('/').pop();
-        embedSrc = `https://player.vimeo.com/video/${videoId}?autoplay=0&controls=1`;
-      }
-
-      return mediaSrc ? (
-        <div className={`relative group ${aspectRatioClass}`}>
-          {isYouTube || isVimeo ? (
-            <iframe
-              src={embedSrc}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className={`${currentLayout.imageClass} w-full h-full object-cover`}
-              title={`Video ${index + 1}`}
-            ></iframe>
+      return (
+        <div className="relative w-full h-full group">
+          {mediaSrc ? (
+            <>
+              <div className="absolute inset-0 flex items-center justify-center">
+                {mediaSrc.includes('youtube') || mediaSrc.includes('youtu.be') ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(mediaSrc)}`}
+                    className="w-full h-full"
+                    allowFullScreen
+                    title={`YouTube video ${index + 1}`}
+                  />
+                ) : mediaSrc.includes('vimeo') ? (
+                  <iframe
+                    src={`https://player.vimeo.com/video/${getVimeoId(mediaSrc)}`}
+                    className="w-full h-full"
+                    allowFullScreen
+                    title={`Vimeo video ${index + 1}`}
+                  />
+                ) : (
+                  <video src={mediaSrc} controls className="w-full h-full" />
+                )}
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddMedia?.(index, 'video');
+                }}
+                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 transition-opacity"
+              >
+                <PlusCircle className="w-8 h-8 text-white" />
+              </button>
+            </>
           ) : (
-            <video 
-              src={mediaSrc} 
-              controls
-              className={`${currentLayout.imageClass} w-full h-full object-cover ${aspectRatioClass}`} 
-              title={`Video ${index + 1}`} 
-            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddMedia?.(index, 'video');
+              }}
+              className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
+            >
+              <Video className="w-8 h-8 text-gray-400 hover:text-blue-500" />
+            </button>
           )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddMedia?.(index, 'video');
-            }}
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 transition-opacity"
-          >
-            <PlusCircle className="w-8 h-8 text-white" />
-          </button>
         </div>
-      ) : (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddMedia?.(index, 'video');
-          }}
-          className={`w-full ${aspectRatioClass} flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors`}
-        >
-          <Video className="w-8 h-8 text-gray-400 hover:text-blue-500" />
-        </button>
       );
-    } else {
-      return mediaSrc ? (
-        <div className={`relative group ${aspectRatioClass}`}>
-          <img 
-            src={mediaSrc} 
-            className={`${currentLayout.imageClass} w-full h-full object-cover ${aspectRatioClass}`} 
-            alt={`Image ${index + 1}`} 
-          />
+    }
+
+    return (
+      <div className="relative w-full h-full group">
+        {mediaSrc ? (
+          <>
+            <img 
+              src={mediaSrc} 
+              className={`${currentLayout.imageClass} transition-transform duration-300 group-hover:scale-105`}
+              alt={`Image ${index + 1}`}
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddMedia?.(index, 'image');
+              }}
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 transition-opacity"
+            >
+              <PlusCircle className="w-8 h-8 text-white" />
+            </button>
+          </>
+        ) : (
           <button
             onClick={(e) => {
               e.stopPropagation();
               onAddMedia?.(index, 'image');
             }}
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 transition-opacity"
+            className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
           >
-            <PlusCircle className="w-8 h-8 text-white" />
+            <ImageIcon className="w-8 h-8 text-gray-400 hover:text-blue-500" />
           </button>
-        </div>
-      ) : (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddMedia?.(index, 'image');
-          }}
-          className={`w-full ${aspectRatioClass} flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors`}
-        >
-          <PlusCircle className="w-8 h-8 text-gray-400 hover:text-blue-500" />
-        </button>
-      );
-    }
-  };
-
-  const renderLayout = () => {
-    return (
-      <div className={currentLayout.containerClass}>
-        {currentLayout.columns > 1 ? (
-          <div className={`grid ${currentLayout.containerClass.includes('grid-cols-10') ? 
-            'grid-cols-10' : 'grid-cols-2'} gap-4`}>
-            {[...mediaSources, ...Array(emptySlots).fill(undefined)].map((mediaSrc, index) => (
-              <div key={index} className={
-                layout === 'layout4' ? 
-                  (index === 0 ? 'col-span-7' : 'col-span-3') :
-                layout === 'layout5' ?
-                  (index === 0 ? 'col-span-3' : 'col-span-7') :
-                  ''
-              }>
-                {renderMediaSlot(mediaSrc, index)}
-              </div>
-            ))}
-          </div>
-        ) : (
-          renderMediaSlot(mediaSources[0], 0)
         )}
       </div>
     );
   };
 
+  const renderLayout = () => {
+    switch(currentLayout.id) {
+      case 'layout1':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            {renderMediaItem(mediaSources[0], 0)}
+          </div>
+        );
+      case 'layout2':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            {renderMediaItem(mediaSources[0], 0)}
+          </div>
+        );
+      case 'layout3':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            <div className={currentLayout.columnClasses?.[0] || 'w-full'}>
+              {renderMediaItem(mediaSources[0], 0)}
+            </div>
+            <div className={currentLayout.columnClasses?.[1] || 'w-full'}>
+              {renderMediaItem(mediaSources[1], 1)}
+            </div>
+          </div>
+        );
+      case 'layout4':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            <div className={currentLayout.columnClasses?.[0] || 'w-full'}>
+              {renderMediaItem(mediaSources[0], 0)}
+            </div>
+            <div className={currentLayout.columnClasses?.[1] || 'w-full'}>
+              {renderMediaItem(mediaSources[1], 1)}
+            </div>
+          </div>
+        );
+      case 'layout5':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            <div className={currentLayout.columnClasses?.[0] || 'w-full'}>
+              {renderMediaItem(mediaSources[0], 0)}
+            </div>
+            <div className={currentLayout.columnClasses?.[1] || 'w-full'}>
+              {renderMediaItem(mediaSources[1], 1)}
+            </div>
+          </div>
+        );
+      case 'layout6':
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            {renderMediaItem(mediaSources[0], 0)}
+          </div>
+        );
+      default:
+        return (
+          <div className={`${currentLayout.containerClass} p-4`}>
+            {renderMediaItem(mediaSources[0], 0)}
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="relative group my-4">
-      {renderLayout()}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 p-2 rounded shadow flex flex-wrap gap-1">
+    <div className="relative group my-8">
+      <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+        {renderLayout()}
+      </div>
+      
+      {showLayoutMenu && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowLayoutMenu(false)}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Select Layout</h3>
+              <button 
+                onClick={() => setShowLayoutMenu(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {IMAGE_LAYOUTS.filter(l => l.mediaType === currentLayout.mediaType).map((layoutOption) => (
+                <button
+                  key={layoutOption.id}
+                  onClick={() => {
+                    onChangeLayout?.(layoutOption.id);
+                    setShowLayoutMenu(false);
+                  }}
+                  className={`flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors ${
+                    layout === layoutOption.id ? 'border-blue-500 bg-blue-50' : ''
+                  }`}
+                >
+                  <div className="bg-gray-100 p-2 rounded-full">
+                    {layoutOption.mediaType === 'video' ? (
+                      <Video className="w-5 h-5" />
+                    ) : (
+                      <ImageIcon className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-medium">{layoutOption.name}</span>
+                    <p className="text-xs text-gray-500">{layoutOption.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         {IMAGE_LAYOUTS.filter(l => l.mediaType === currentLayout.mediaType).map((layoutOption) => (
           <button
             key={layoutOption.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              onChangeLayout?.(layoutOption.id);
-            }}
-            className={`px-2 py-1 text-xs ${
-              layout === layoutOption.id ? 'bg-blue-100' : 'bg-gray-100'
-            } rounded hover:bg-gray-200 transition-colors`}
+            onClick={() => setShowLayoutMenu(true)}
+            className={`px-3 py-1 text-xs rounded-full shadow ${
+              layout === layoutOption.id 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            } transition-colors`}
             title={layoutOption.description}
           >
             {layoutOption.name}
@@ -383,7 +494,70 @@ function MediaBlock({
       </div>
     </div>
   );
-}
+};
+
+const BlockControls = ({ 
+  blockId, 
+  index, 
+  totalBlocks,
+  onMoveUp, 
+  onMoveDown, 
+  onAdd, 
+  onDelete 
+}: {
+  blockId: string;
+  index: number;
+  totalBlocks: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onAdd: () => void;
+  onDelete: () => void;
+}) => {
+  return (
+    <div className="flex justify-between items-center mt-2 px-2 bg-gray-50 p-2 rounded-lg">
+      <div className="flex items-center gap-1 text-sm text-gray-500">
+        <span>Block {index + 1} of {totalBlocks}</span>
+      </div>
+      
+      <div className="flex gap-2">
+        <button
+          onClick={onMoveUp}
+          disabled={index === 0}
+          className={`p-2 rounded-full ${
+            index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'
+          } transition-colors`}
+          title="Move up"
+        >
+          <ArrowUp className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onMoveDown}
+          disabled={index === totalBlocks - 1}
+          className={`p-2 rounded-full ${
+            index === totalBlocks - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'
+          } transition-colors`}
+          title="Move down"
+        >
+          <ArrowDown className="w-4 h-4" />
+        </button>
+        <button 
+          onClick={onAdd}
+          className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+          title="Add block below"
+        >
+          <PlusCircle className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+          title="Delete block"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function AdminPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -424,6 +598,9 @@ export default function AdminPage() {
       Underline,
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 hover:underline',
+        },
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
@@ -445,7 +622,7 @@ export default function AdminPage() {
     },
     editorProps: {
       attributes: {
-        class: 'whitespace-normal prose max-w-none',
+        class: 'prose max-w-none p-4 focus:outline-none min-h-[200px]',
       },
     },
   });
@@ -505,8 +682,10 @@ export default function AdminPage() {
       setIsNewWork(true);
       setHasChanges(true);
       setActiveTab('form');
+      toast.success("New work created successfully!");
     } catch (error) {
       console.error('Failed to create work:', error);
+      toast.error("Failed to create new work. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -529,8 +708,10 @@ export default function AdminPage() {
       setHasChanges(false);
       setIsNewWork(false);
       setLastSaved(new Date().toISOString());
+      toast.success("Work saved successfully!");
     } catch (error) {
       console.error('Failed to save work:', error);
+      toast.error("Failed to save work. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -610,6 +791,7 @@ export default function AdminPage() {
         }));
         
         setHasChanges(true);
+        toast.success("Image uploaded successfully!");
       } catch (error) {
         console.error('Upload failed:', error);
         setUploadError(
@@ -617,6 +799,7 @@ export default function AdminPage() {
             ? error.message 
             : 'Failed to upload image. Please try again.'
         );
+        toast.error("Failed to upload image. Please try again.");
       }
     };
 
@@ -669,7 +852,7 @@ export default function AdminPage() {
 
   const removeBlock = (id: string) => {
     if (blocks.length <= 1 && blocks.some(b => b.type === 'text' && cleanHtmlContent(b.content) !== '')) {
-      alert('You must keep at least one block, or clear existing content before removing the last block.');
+      toast.warning("You must keep at least one block, or clear existing content before removing the last block.");
       return;
     }
     
@@ -678,6 +861,7 @@ export default function AdminPage() {
     if (activeBlockId === id) {
       setActiveBlockId(blocks[0]?.id || null);
     }
+    toast.success("Block removed successfully!");
   };
 
   const moveBlock = (id: string, direction: 'up' | 'down') => {
@@ -713,43 +897,49 @@ export default function AdminPage() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">Add New Content</h3>
-            <button 
-              onClick={() => setShowAddMenu({show: false})}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b bg-gray-50 rounded-t-lg">
+            <h3 className="text-lg font-semibold text-gray-800">Add New Content Block</h3>
+            
           </div>
-          
-          {uploadError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-              {uploadError}
+
+          {/* Content */}
+          <div className="p-4">
+            {uploadError && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg">
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  {uploadError}
+                </div>
+              </div>
+            )}
+
+            {/* Text Block Option */}
+            <div className="mb-4">
+              <button
+                onClick={() => {
+                  showAddMenu.blockId ? addTextBlock(showAddMenu.blockId) : addTextBlock();
+                  setShowAddMenu({show: false});
+                }}
+                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+              >
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <Type className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold text-gray-800">Text Block</p>
+                  <p className="text-sm text-gray-600">Add a rich text editor for content</p>
+                </div>
+              </button>
             </div>
-          )}
 
-          <div className="space-y-3">
-            <button
-              onClick={() => {
-                showAddMenu.blockId ? addTextBlock(showAddMenu.blockId) : addTextBlock();
-                setShowAddMenu({show: false});
-              }}
-              className="w-full flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                <Type className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium">Text Block</p>
-                <p className="text-sm text-gray-500">Add a text editor block</p>
-              </div>
-            </button>
-
-            <div className="border-t pt-3">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">Media Layouts</h4>
-              <div className="grid grid-cols-2 gap-3">
+            {/* Media Layouts */}
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Media Layouts</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {IMAGE_LAYOUTS.map((layout) => (
                   <button
                     key={layout.id}
@@ -759,23 +949,33 @@ export default function AdminPage() {
                         : addMediaBlock(undefined, layout.id);
                       setShowAddMenu({show: false});
                     }}
-                    className="flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex flex-col items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
                   >
-                    <div className="bg-gray-100 p-2 rounded-full">
+                    <div className="bg-gray-100 p-3 rounded-lg">
                       {layout.mediaType === 'video' ? (
-                        <Video className="w-5 h-5" />
+                        <Video className="w-6 h-6 text-gray-600" />
                       ) : (
-                        <ImageIcon className="w-5 h-5" />
+                        <ImageIcon className="w-6 h-6 text-gray-600" />
                       )}
                     </div>
                     <div className="text-center">
-                      <span className="text-sm font-medium">{layout.name}</span>
-                      <p className="text-xs text-gray-500">{layout.description}</p>
+                      <span className="text-sm font-semibold text-gray-800 block">{layout.name}</span>
+                      <p className="text-xs text-gray-600 mt-1">{layout.description}</p>
                     </div>
                   </button>
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t bg-gray-50 rounded-b-lg">
+            <button
+              onClick={() => setShowAddMenu({show: false})}
+              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -834,8 +1034,10 @@ export default function AdminPage() {
                 <button
                   key={type}
                   onClick={() => setWorkTypeFilter(type as any)}
-                  className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${
-                    workTypeFilter === type ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                  className={`px-3 py-1 text-sm rounded-full whitespace-nowrap transition-colors ${
+                    workTypeFilter === type 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
                   {type}
@@ -846,7 +1048,7 @@ export default function AdminPage() {
           
           <button
             onClick={handleCreateWork}
-            className="w-full hidden md:flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors"
+            className="w-full hidden md:flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors font-medium"
           >
             <PlusCircle className="w-4 h-4" />
             Add New Work
@@ -869,17 +1071,26 @@ export default function AdminPage() {
                 setHasChanges(false);
                 setActiveTab('form');
               }}
-              className={`p-4 border-b cursor-pointer hover:bg-gray-50 flex justify-between items-center ${
-                selectedWork?.id === work.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+              className={`p-4 border-b cursor-pointer transition-colors flex justify-between items-center ${
+                selectedWork?.id === work.id 
+                  ? 'bg-blue-50 border-l-4 border-l-blue-600' 
+                  : 'hover:bg-gray-50'
               }`}
             >
               <div>
                 <h3 className="font-medium">{work.name}</h3>
-                <p className="text-sm text-gray-500">{work.type} • {work.location}</p>
+                <p className="text-sm text-gray-500">
+                  {work.type} • {work.location || 'No location'}
+                </p>
               </div>
-              <span className="text-xs text-gray-400 whitespace-nowrap">
-                {new Date(work.updated_at).toLocaleDateString()}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 whitespace-nowrap">
+                  {new Date(work.updated_at).toLocaleDateString()}
+                </span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
             </div>
           ))}
         </div>
@@ -895,12 +1106,17 @@ export default function AdminPage() {
                   {isNewWork ? 'New Work' : selectedWork.name}
                 </h2>
                 <div className="flex items-center gap-2">
-                  {lastSaved && (
-                    <span className="text-sm text-gray-500 hidden md:inline">
-                      Last saved: {new Date(lastSaved).toLocaleString()}
-                      {hasChanges && <span className="text-yellow-500 ml-2">*</span>}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    {isSaving ? (
+                      <span className="flex items-center gap-1">
+                        <span className="animate-pulse">Saving...</span>
+                      </span>
+                    ) : hasChanges ? (
+                      <span className="text-yellow-600">Unsaved changes</span>
+                    ) : lastSaved ? (
+                      <span>Saved {new Date(lastSaved).toLocaleTimeString()}</span>
+                    ) : null}
+                  </div>
                   <button
                     onClick={handleSaveWork}
                     disabled={isSaving || !hasChanges}
@@ -908,7 +1124,7 @@ export default function AdminPage() {
                       isSaving 
                         ? 'bg-gray-400 text-white' 
                         : hasChanges 
-                          ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                           : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -923,7 +1139,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('form')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
                     activeTab === 'form' 
-                      ? 'border-b-2 border-blue-500 text-blue-600' 
+                      ? 'border-b-2 border-blue-600 text-blue-600' 
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
@@ -934,7 +1150,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('content')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
                     activeTab === 'content' 
-                      ? 'border-b-2 border-blue-500 text-blue-600' 
+                      ? 'border-b-2 border-blue-600 text-blue-600' 
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
@@ -1118,8 +1334,9 @@ export default function AdminPage() {
                                 const url = await handleImageUpload(file);
                                 setSelectedWork({...selectedWork, main_image: url});
                                 setHasChanges(true);
+                                toast.success("Main image uploaded successfully!");
                               } catch (error) {
-                                alert(`Error uploading main image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                                toast.error(`Error uploading main image: ${error instanceof Error ? error.message : 'Unknown error'}`);
                               }
                             }
                           };
@@ -1185,47 +1402,15 @@ export default function AdminPage() {
                           />
                         )}
                         
-                        {/* Block Controls - Now below the block */}
-                        <div className="flex justify-between items-center mt-2 px-2">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => moveBlock(block.id, 'up')}
-                              disabled={index === 0}
-                              className={`p-2 rounded ${
-                                index === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
-                              } transition-colors`}
-                              title="Move up"
-                            >
-                              <ArrowUp className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => moveBlock(block.id, 'down')}
-                              disabled={index === blocks.length - 1}
-                              className={`p-2 rounded ${
-                                index === blocks.length - 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
-                              } transition-colors`}
-                              title="Move down"
-                            >
-                              <ArrowDown className="w-4 h-4" />
-                            </button>
-                          </div>
-                          
-                          <button 
-                            onClick={() => setShowAddMenu({show: true, blockId: block.id})}
-                            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
-                            title="Add content block"
-                          >
-                            <PlusCircle className="w-5 h-5 text-gray-600" />
-                          </button>
-                          
-                          <button
-                            onClick={() => removeBlock(block.id)}
-                            className="p-2 text-red-600 rounded hover:bg-red-100 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <BlockControls
+                          blockId={block.id}
+                          index={index}
+                          totalBlocks={blocks.length}
+                          onMoveUp={() => moveBlock(block.id, 'up')}
+                          onMoveDown={() => moveBlock(block.id, 'down')}
+                          onAdd={() => setShowAddMenu({show: true, blockId: block.id})}
+                          onDelete={() => removeBlock(block.id)}
+                        />
                       </div>
                     ))}
                   </div>
