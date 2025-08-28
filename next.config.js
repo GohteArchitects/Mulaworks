@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+// Baris di atas ini menggantikan 'import type' dan tetap memberikan autocomplete.
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -17,4 +17,5 @@ const nextConfig: NextConfig = {
   // Any other Next.js configurations can go here
 };
 
-export default nextConfig;
+// Menggunakan module.exports untuk kompatibilitas dengan Next.js 14
+module.exports = nextConfig;
