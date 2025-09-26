@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getWorks } from '@/lib/supabase';
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from './WorkGalleryPage.module.css';
+import styles from './WorkPage.module.css';
 
 interface Work {
   id: string;
@@ -254,7 +254,7 @@ export default function WorkGalleryPage() {
                     onMouseEnter={() => handleWorkHover(work)}
                   >
                     <div className={styles.mobileWorkTitle}>{work.name}</div>
-                    <Link href={`/gohte-architects/work/${work.id}`} className={styles.workLink}>
+                    <Link href={`/work/${work.id}`} className={styles.workLink}>
                       <div className={styles.imageContainer}>
                         <Image
                           src={work.main_image || '/placeholder-project.svg'}

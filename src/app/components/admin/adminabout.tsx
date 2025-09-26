@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,7 +29,7 @@ export default function AdminAbout() {
   const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch publications
-  const fetchPublications = async () => {
+  const fetchPublications = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -45,11 +45,11 @@ export default function AdminAbout() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPublications();
-  }, []);
+  }, [fetchPublications]);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -58,6 +58,7 @@ export default function AdminAbout() {
       ...prev,
       [name]: value
     }));
+    setHasChanges(true);
   };
 
   // Handle form submission
@@ -108,7 +109,7 @@ export default function AdminAbout() {
   const handleEdit = (publication: Publication) => {
     setFormData(publication);
     setEditingId(publication.id || null);
-    setHasChanges(true);
+    setHasChanges(false); // Reset changes status when starting to edit
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -126,6 +127,8 @@ export default function AdminAbout() {
       if (error) throw error;
       setSuccess('Publication deleted successfully');
       toast.success("Publication deleted successfully!");
+      setEditingId(null); // Clear editing state if the deleted item was being edited
+      setFormData({ year: '', publication: '', article: '' });
       await fetchPublications();
     } catch (error) {
       setError('Failed to delete publication');
@@ -150,13 +153,13 @@ export default function AdminAbout() {
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">About Section Admin</h1>
           <div className="flex items-center gap-2">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 hidden md:block">
               {isSaving ? (
                 <span className="flex items-center gap-1">
                   <span className="animate-pulse">Saving...</span>
                 </span>
               ) : hasChanges ? (
-                <span className="text-yellow-600">Unsaved changes</span>
+                <span className="text-gray-600">Unsaved changes</span>
               ) : lastSaved ? (
                 <span>Saved {new Date(lastSaved).toLocaleTimeString()}</span>
               ) : null}
@@ -168,12 +171,12 @@ export default function AdminAbout() {
                 isSaving 
                   ? 'bg-gray-400 text-white' 
                   : hasChanges 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    ? 'bg-gray-800 hover:bg-black text-white' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               }`}
             >
               <Save className="w-4 h-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? 'Saving...' : editingId ? 'Update' : 'Add'}
             </button>
           </div>
         </div>
@@ -182,13 +185,13 @@ export default function AdminAbout() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {/* Publication Form */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">
             {editingId ? 'Edit Publication' : 'Add New Publication'}
           </h2>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+            <div className="mb-4 p-3 bg-gray-100 text-gray-700 rounded-lg border border-gray-300">
               {error}
             </div>
           )}
@@ -204,8 +207,8 @@ export default function AdminAbout() {
                   onChange={handleInputChange}
                   required
                   maxLength={4}
-                  placeholder="2023"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g., 2023"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -217,8 +220,8 @@ export default function AdminAbout() {
                   value={formData.publication}
                   onChange={handleInputChange}
                   required
-                  placeholder="Architectural Digest"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g., Architectural Digest"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -230,8 +233,8 @@ export default function AdminAbout() {
                   value={formData.article}
                   onChange={handleInputChange}
                   required
-                  placeholder="Article title or description"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g., Article title or description"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
             </div>
@@ -241,7 +244,7 @@ export default function AdminAbout() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
                 >
                   <X className="w-4 h-4" />
                   Cancel
@@ -249,9 +252,10 @@ export default function AdminAbout() {
               )}
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-2"
+                disabled={isSaving || !hasChanges}
+                className="px-4 py-2 bg-gray-800 hover:bg-black text-white rounded-md transition-colors flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                <Save className="w-4 h-4" />
+                {editingId ? <Save className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
                 {editingId ? 'Update' : 'Add'} Publication
               </button>
             </div>
@@ -259,9 +263,9 @@ export default function AdminAbout() {
         </div>
 
         {/* Publications List */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Current Publications</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Current Publications</h2>
             <div className="text-sm text-gray-500">
               {publications.length} {publications.length === 1 ? 'entry' : 'entries'}
             </div>
@@ -296,27 +300,27 @@ export default function AdminAbout() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {publications.map((pub) => (
-                    <tr key={pub.id} className="hover:bg-gray-50">
+                    <tr key={pub.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {pub.year}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         {pub.publication}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-gray-600">
                         {pub.article}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleEdit(pub)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            className="text-gray-600 hover:text-black transition-colors"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(pub.id!)}
-                            className="text-red-600 hover:text-red-900 transition-colors flex items-center gap-1"
+                            className="text-gray-600 hover:text-black transition-colors flex items-center gap-1"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

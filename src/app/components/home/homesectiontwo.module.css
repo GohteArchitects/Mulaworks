@@ -86,7 +86,7 @@
 .underlineAnimation {
   position: absolute;
   bottom: 0;
-  left: 20px;
+  left: 0;
   width: 0;
   height: 1px;
   background-color: #D7A96D;
@@ -102,7 +102,7 @@
 }
 
 .buttonContainer:hover .underlineAnimation {
-  width: calc(100% - 20px);
+  width: calc(100% - 0px);
   background-color: #D7A96D;
 }
 

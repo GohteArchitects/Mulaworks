@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (!session || error) {
-        router.push('/gohte-architects/auth/login');
+        router.push('/auth/login');
       } else {
         setLoading(false);
       }
@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
-        router.push('/gohte-architects/auth/login');
+        router.push('/auth/login');
       }
     });
 

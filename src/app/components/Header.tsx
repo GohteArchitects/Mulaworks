@@ -79,17 +79,17 @@ export default function Header() {
                   </Link>
                 </li>
                 <li className={`${styles.menuItem} ${isMenuOpen ? styles.reveal : styles.hide}`}>
-                  <Link href="/gohte-architects/works" className={styles.navLink} onClick={toggleMenu}>
+                  <Link href="/work" className={styles.navLink} onClick={toggleMenu}>
                     WORKS
                   </Link>
                 </li>
                 <li className={`${styles.menuItem} ${isMenuOpen ? styles.reveal : styles.hide}`}>
-                  <Link href="/gohte-architects/about" className={styles.navLink} onClick={toggleMenu}>
+                  <Link href="/about" className={styles.navLink} onClick={toggleMenu}>
                     ABOUT US
                   </Link>
                 </li>
                 <li className={`${styles.menuItem} ${isMenuOpen ? styles.reveal : styles.hide}`}>
-                  <Link href="/gohte-architects/contact" className={styles.navLink} onClick={toggleMenu}>
+                  <Link href="/contact" className={styles.navLink} onClick={toggleMenu}>
                     CONTACT US
                   </Link>
                 </li>
@@ -118,7 +118,7 @@ export default function Header() {
 
           <div className={styles.rightSection}>
             {!isMenuOpen && (
-              <Link href="/gohte-architects/contact" className={`${styles.contactButton} ${styles.hideOnMobile}`}>
+              <Link href="/contact" className={`${styles.contactButton} ${styles.hideOnMobile}`}>
                 <span className={styles.buttonText}>CONTACT US</span>
               </Link>
             )}

@@ -1,13 +1,9 @@
-// @/app/layout.tsx
+// @/app/layout.tsx (VERSI BARU YANG SUDAH DIBERSIHKAN)
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import LenisProvider from '../app/components/LenisProvider';
-import Header from '../app/components/Header';
-import Footer from '../app/components/Footer';
 
-// Konfigurasi font Inter dengan opsi optimalisasi
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -16,38 +12,14 @@ const inter = Inter({
   adjustFontFallback: true,
 });
 
-// Metadata yang disempurnakan untuk SEO dan Social Media Sharing
+// Metadata bisa tetap di sini karena bersifat global
 export const metadata: Metadata = {
   title: {
-    template: '%s | Gohte Architects', // Judul halaman anak akan masuk di %s
-    default: 'Gohte Architects', // Judul default untuk halaman utama
+    template: '%s | Gohte Architects',
+    default: 'Gohte Architects',
   },
   description: 'Portfolio of Gohte Architects, an innovative architecture firm based in Indonesia, showcasing residential and commercial projects.',
-  
-  // Open Graph (untuk media sosial seperti Facebook, LinkedIn, dll.)
-  openGraph: {
-    title: 'Gohte Architects',
-    description: 'Portfolio of innovative residential and commercial projects.',
-    url: 'https://nama-domain-anda.com', // Ganti dengan URL website Anda nanti
-    siteName: 'Gohte Architects',
-    images: [
-      {
-        url: '/og-image.png', // Gambar preview saat link dibagikan (1200x630px)
-        width: 1200,
-        height: 630,
-        alt: 'Gohte Architects Portfolio Preview',
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-
-  // Favicon & Icons
-  // Pastikan file favicon.ico ada di dalam folder /app
-  icons: {
-    icon: '/favicon.ico',
-    // Anda juga bisa menambahkan tipe lain seperti apple-touch-icon di sini
-  },
+  // ... sisa metadata Anda (Open Graph, icons, dll) bisa tetap di sini
 };
 
 export default function RootLayout({
@@ -55,21 +27,26 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const removeFdProcessedId = {
+    __html: `
+      if (typeof window !== 'undefined') {
+        const elements = document.querySelectorAll('[fdprocessedid]');
+        elements.forEach(el => el.removeAttribute('fdprocessedid'));
+      }
+    `,
+  };
+
   return (
     <html 
       lang="en" 
       className={`${inter.variable} ${inter.className} antialiased`}
     >
+      <head>
+        {/* Tambahkan skrip ini untuk mencegah "Hydration Mismatch" */}
+        <script dangerouslySetInnerHTML={removeFdProcessedId} />
+      </head>
       <body className="font-sans bg-white text-gray-900">
-        <LenisProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </LenisProvider>
+        {children}
       </body>
     </html>
   );

@@ -71,7 +71,7 @@ const HomeHero = () => {
   }, []);
 
   return (
-    <Link href="/gohte-architects/works" className={styles.heroLink}>
+    <Link href="/work" className={styles.heroLink}>
       <section className={styles.heroContainer} ref={heroRef}>
         {/* Hover Effect Element */}
         <div 

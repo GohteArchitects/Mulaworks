@@ -3,14 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import HomeHero from './components/home/homehero';
-import HomeSectionTwo from './components/home/homesectiontwo';
-import HomeSectionThree from './components/home/homesectionthree';
-import HomeSectionFour from './components/home/homesectionfour';
-import HomeSectionSix from './components/home/homesectionsix';
-import styles from './home.module.css'; // Create this CSS module
+import AboutSectionOne from '../../components/about/aboutsectionone';
+import AboutSectionTwo from '../../components/about/aboutsectiontwo';
+import AboutSectionThree from '../../components/about/aboutsectionthree';
+import styles from './AboutPage.module.css'; // Create this CSS module
 
-export default function Home() {
+export default function AboutPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
@@ -87,11 +85,9 @@ export default function Home() {
           }
         }}
       >
-        <HomeHero />
-        <HomeSectionTwo />
-        <HomeSectionThree />
-        <HomeSectionFour />
-        <HomeSectionSix />
+        <AboutSectionOne />
+        <AboutSectionTwo />
+        <AboutSectionThree />
       </motion.main>
     </>
   );

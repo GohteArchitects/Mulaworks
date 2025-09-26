@@ -415,7 +415,7 @@ export default function WorkDetailPage({ params }: PageProps) {
       <div className={styles.errorContainer}>
         <h2 className={styles.errorTitle}>Error Loading Project</h2>
         <p className={styles.errorMessage}>{error}</p>
-        <Link href="/gohte-architects/works" className={styles.backLink}>
+        <Link href="/work" className={styles.backLink}>
           ← BACK TO WORKS
         </Link>
       </div>
@@ -427,7 +427,7 @@ export default function WorkDetailPage({ params }: PageProps) {
       <div className={styles.notFoundContainer}>
         <h2 className={styles.notFoundTitle}>Project Not Found</h2>
         <p className={styles.notFoundMessage}>The requested project could not be found.</p>
-        <Link href="/gohte-architects/works" className={styles.backLink}>
+        <Link href="/work" className={styles.backLink}>
           ← BACK TO WORKS
         </Link>
       </div>
@@ -498,7 +498,7 @@ export default function WorkDetailPage({ params }: PageProps) {
         <div className={styles.contentWrapper}>
           <div className={styles.leftSection}>
             <div className={styles.stickyContainer}>
-              <Link href="/gohte-architects/works" className={styles.backButton}>
+              <Link href="/work" className={styles.backButton}>
                 <svg className={styles.backIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -554,7 +554,7 @@ export default function WorkDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              <Link href="/gohte-architects/contact" className={styles.getQuoteButton}>
+              <Link href="/contact" className={styles.getQuoteButton}>
                 <span className={styles.buttonText}>GET QUOTE</span>
               </Link>
             </div>
@@ -617,7 +617,7 @@ export default function WorkDetailPage({ params }: PageProps) {
                       width: `${100 / (isMobile ? 1 : 2)}%`
                     }}
                   >
-                    <Link href={`/gohte-architects/work/${relatedWork.id}`} className={styles.relatedWorkCard}>
+                    <Link href={`/work/${relatedWork.id}`} className={styles.relatedWorkCard}>
                       <div className={styles.workInfoContainer}>
                         <span className={styles.workNumber}>
                           {(index + 1).toString().padStart(2, '0')} / {relatedWork.name}

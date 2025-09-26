@@ -19,7 +19,7 @@ const HomeSectionTwo = () => {
         
         <div className={styles.buttonContainer}>
           <div className={styles.circleBorder}></div>
-          <Link href="/gohte-architects/about" className={styles.learnMoreButton}>
+          <Link href="/about" className={styles.learnMoreButton}>
             learn more about us
             <span className={styles.underlineAnimation}></span>
           </Link>

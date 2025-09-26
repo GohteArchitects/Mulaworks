@@ -7,8 +7,8 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import { ImageLayoutExtension } from '../../../lib/extensions';
-import { getPageContent, updatePageContent, uploadImage, getWorks, createWork, updateWork } from '@/lib/supabase';
-import { PlusCircle, ArrowUp, ArrowDown, Trash2, X, Type, Image as ImageIcon, Search, Video, FileText, Layout, Save } from 'lucide-react';
+import { getPageContent, updatePageContent, uploadImage, getWorks, createWork, updateWork, deleteWork } from '@/lib/supabase';
+import { PlusCircle, ArrowUp, ArrowDown, Trash2, X, Type, Image as ImageIcon, Search, Video, FileText, Layout, Save, ChevronLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -235,7 +235,7 @@ const EditorToolbar = ({ editor }: { editor: any }) => {
           key={index}
           onClick={item.action}
           className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-            item.active ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+            item.active ? 'bg-gray-200 text-gray-800' : 'text-gray-700'
           }`}
           title={item.title}
         >
@@ -317,9 +317,9 @@ const MediaBlock = ({
                 e.stopPropagation();
                 onAddMedia?.(index, 'video');
               }}
-              className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
+              className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-500 transition-colors"
             >
-              <Video className="w-8 h-8 text-gray-400 hover:text-blue-500" />
+              <Video className="w-8 h-8 text-gray-400 hover:text-gray-600" />
             </button>
           )}
         </div>
@@ -351,9 +351,9 @@ const MediaBlock = ({
               e.stopPropagation();
               onAddMedia?.(index, 'image');
             }}
-            className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
+            className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-500 transition-colors"
           >
-            <ImageIcon className="w-8 h-8 text-gray-400 hover:text-blue-500" />
+            <ImageIcon className="w-8 h-8 text-gray-400 hover:text-gray-600" />
           </button>
         )}
       </div>
@@ -455,7 +455,7 @@ const MediaBlock = ({
                     setShowLayoutMenu(false);
                   }}
                   className={`flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors ${
-                    layout === layoutOption.id ? 'border-blue-500 bg-blue-50' : ''
+                    layout === layoutOption.id ? 'border-gray-500 bg-gray-100' : ''
                   }`}
                 >
                   <div className="bg-gray-100 p-2 rounded-full">
@@ -483,7 +483,7 @@ const MediaBlock = ({
             onClick={() => setShowLayoutMenu(true)}
             className={`px-3 py-1 text-xs rounded-full shadow ${
               layout === layoutOption.id 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-black text-white' 
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             } transition-colors`}
             title={layoutOption.description}
@@ -542,14 +542,14 @@ const BlockControls = ({
         </button>
         <button 
           onClick={onAdd}
-          className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+          className="p-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
           title="Add block below"
         >
           <PlusCircle className="w-4 h-4" />
         </button>
         <button
           onClick={onDelete}
-          className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+          className="p-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
           title="Delete block"
         >
           <Trash2 className="w-4 h-4" />
@@ -599,7 +599,7 @@ export default function AdminPage() {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 hover:underline',
+          class: 'text-gray-600 hover:underline',
         },
       }),
       TextAlign.configure({
@@ -627,34 +627,47 @@ export default function AdminPage() {
     },
   });
 
-  useEffect(() => {
-    const loadWorks = async () => {
-      try {
-        const worksData = await getWorks();
-        setWorks(worksData);
-        if (worksData.length > 0) {
-          setSelectedWork(worksData[0]);
-          try {
-            const content = JSON.parse(worksData[0].content);
-            setBlocks(content);
-          } catch {
-            setBlocks([{ id: '1', type: 'text', content: worksData[0].content || '<p></p>' }]);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load works:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadWorks();
+  const loadWorks = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const worksData = await getWorks();
+      setWorks(worksData);
+      
+      // Do not select a work on initial load
+      // setSelectedWork(worksData.length > 0 ? worksData[0] : null);
+      // setBlocks(worksData.length > 0 ? JSON.parse(worksData[0].content) : []);
+      setSelectedWork(null);
+      setBlocks([]);
+
+    } catch (error) {
+      console.error('Failed to load works:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadWorks();
+  }, [loadWorks]);
 
   const filteredWorks = works.filter(work => {
     const matchesSearch = work.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = workTypeFilter === 'All' || work.type === workTypeFilter;
     return matchesSearch && matchesType;
   });
+
+  const handleSelectWork = (work: any) => {
+    setSelectedWork(work);
+    setIsNewWork(false);
+    try {
+      const content = JSON.parse(work.content);
+      setBlocks(content);
+    } catch {
+      setBlocks([{ id: '1', type: 'text', content: work.content || '<p></p>' }]);
+    }
+    setHasChanges(false);
+    setActiveTab('form');
+  };
 
   const handleCreateWork = async () => {
     const newWork = {
@@ -686,6 +699,32 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Failed to create work:', error);
       toast.error("Failed to create new work. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteWork = async () => {
+    if (!selectedWork) return;
+
+    if (!window.confirm(`Are you sure you want to delete the project "${selectedWork.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await deleteWork(selectedWork.id);
+      
+      const updatedWorks = works.filter(w => w.id !== selectedWork.id);
+      setWorks(updatedWorks);
+      setSelectedWork(null); // Unselect the work after deletion
+      setBlocks([]);
+      setHasChanges(false);
+      setIsNewWork(false);
+      toast.success(`Project "${selectedWork.name}" deleted successfully.`);
+    } catch (error) {
+      console.error('Failed to delete work:', error);
+      toast.error("Failed to delete work. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -907,7 +946,7 @@ export default function AdminPage() {
           {/* Content */}
           <div className="p-4">
             {uploadError && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg">
+              <div className="mb-4 p-3 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg">
                 <div className="flex items-center">
                   <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -924,10 +963,10 @@ export default function AdminPage() {
                   showAddMenu.blockId ? addTextBlock(showAddMenu.blockId) : addTextBlock();
                   setShowAddMenu({show: false});
                 }}
-                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-500 hover:bg-gray-100 transition-all duration-200"
               >
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <Type className="w-6 h-6 text-blue-600" />
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <Type className="w-6 h-6 text-gray-600" />
                 </div>
                 <div className="text-left">
                   <p className="font-semibold text-gray-800">Text Block</p>
@@ -949,7 +988,7 @@ export default function AdminPage() {
                         : addMediaBlock(undefined, layout.id);
                       setShowAddMenu({show: false});
                     }}
-                    className="flex flex-col items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                    className="flex flex-col items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-500 hover:bg-gray-100 transition-all duration-200"
                   >
                     <div className="bg-gray-100 p-3 rounded-lg">
                       {layout.mediaType === 'video' ? (
@@ -1001,20 +1040,9 @@ export default function AdminPage() {
 
   return (
     <div className="flex h-screen bg-gray-50 flex-col md:flex-row">
-      {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Works</h1>
-        <button
-          onClick={handleCreateWork}
-          className="p-2 bg-blue-500 text-white rounded-full"
-        >
-          <PlusCircle className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Left sidebar - 35% width */}
-      <div className="w-full md:w-[35%] border-r bg-white flex flex-col">
-        <div className="p-4 border-b hidden md:block">
+      {/* Sidebar for all devices, full width on mobile unless a work is selected */}
+      <div className={`w-full md:w-[35%] border-r bg-white flex-col ${isMobile && selectedWork ? 'hidden' : 'flex'}`}>
+        <div className="p-4 border-b">
           <h2 className="text-xl font-bold mb-4">Works</h2>
           
           <div className="flex flex-col space-y-3 mb-4">
@@ -1023,7 +1051,7 @@ export default function AdminPage() {
               <input
                 type="text"
                 placeholder="Search works..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -1036,7 +1064,7 @@ export default function AdminPage() {
                   onClick={() => setWorkTypeFilter(type as any)}
                   className={`px-3 py-1 text-sm rounded-full whitespace-nowrap transition-colors ${
                     workTypeFilter === type 
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-black text-white' 
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
@@ -1048,32 +1076,31 @@ export default function AdminPage() {
           
           <button
             onClick={handleCreateWork}
-            className="w-full hidden md:flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors font-medium"
+            className="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-black text-white py-3 px-4 rounded-lg transition-colors font-medium"
           >
             <PlusCircle className="w-4 h-4" />
             Add New Work
           </button>
+          
+          {selectedWork && (
+            <button
+              onClick={handleDeleteWork}
+              className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-lg transition-colors font-medium mt-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Project
+            </button>
+          )}
         </div>
         
         <div className="flex-1 overflow-y-auto">
           {filteredWorks.map(work => (
             <div
               key={work.id}
-              onClick={() => {
-                setSelectedWork(work);
-                setIsNewWork(false);
-                try {
-                  const content = JSON.parse(work.content);
-                  setBlocks(content);
-                } catch {
-                  setBlocks([{ id: '1', type: 'text', content: work.content || '<p></p>' }]);
-                }
-                setHasChanges(false);
-                setActiveTab('form');
-              }}
+              onClick={() => handleSelectWork(work)}
               className={`p-4 border-b cursor-pointer transition-colors flex justify-between items-center ${
                 selectedWork?.id === work.id 
-                  ? 'bg-blue-50 border-l-4 border-l-blue-600' 
+                  ? 'bg-gray-100 border-l-4 border-l-black' 
                   : 'hover:bg-gray-50'
               }`}
             >
@@ -1096,335 +1123,342 @@ export default function AdminPage() {
         </div>
       </div>
       
-      {/* Right content area - 65% width */}
-      <div className="w-full md:w-[65%] flex flex-col">
-        {selectedWork ? (
-          <>
-            <div className="p-4 border-b bg-white">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
-                <h2 className="text-xl font-bold truncate">
-                  {isNewWork ? 'New Work' : selectedWork.name}
-                </h2>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    {isSaving ? (
-                      <span className="flex items-center gap-1">
-                        <span className="animate-pulse">Saving...</span>
-                      </span>
-                    ) : hasChanges ? (
-                      <span className="text-yellow-600">Unsaved changes</span>
-                    ) : lastSaved ? (
-                      <span>Saved {new Date(lastSaved).toLocaleTimeString()}</span>
-                    ) : null}
-                  </div>
-                  <button
-                    onClick={handleSaveWork}
-                    disabled={isSaving || !hasChanges}
-                    className={`px-4 py-2 rounded transition-colors ${
-                      isSaving 
-                        ? 'bg-gray-400 text-white' 
-                        : hasChanges 
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </button>
+      {/* Right content area - 65% width, only shown when a work is selected */}
+      {selectedWork && (
+        <div className="w-full md:w-[65%] flex flex-col">
+          <div className="p-4 border-b bg-white">
+            <div className="flex items-center gap-2 md:hidden">
+              <button 
+                onClick={() => setSelectedWork(null)}
+                className="p-2 -ml-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-bold truncate flex-1">
+                {isNewWork ? 'New Work' : selectedWork.name}
+              </h2>
+            </div>
+            
+            <div className="hidden md:flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
+              <h2 className="text-xl font-bold truncate">
+                {isNewWork ? 'New Work' : selectedWork.name}
+              </h2>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  {isSaving ? (
+                    <span className="flex items-center gap-1">
+                      <span className="animate-pulse">Saving...</span>
+                    </span>
+                  ) : hasChanges ? (
+                    <span className="text-gray-600">Unsaved changes</span>
+                  ) : lastSaved ? (
+                    <span>Saved {new Date(lastSaved).toLocaleTimeString()}</span>
+                  ) : null}
                 </div>
-              </div>
-              
-              {/* Tab Navigation */}
-              <div className="flex border-b border-gray-200">
                 <button
-                  onClick={() => setActiveTab('form')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === 'form' 
-                      ? 'border-b-2 border-blue-600 text-blue-600' 
-                      : 'text-gray-600 hover:text-gray-800'
+                  onClick={handleSaveWork}
+                  disabled={isSaving || !hasChanges}
+                  className={`px-4 py-2 rounded transition-colors ${
+                    isSaving 
+                      ? 'bg-gray-400 text-white' 
+                      : hasChanges 
+                        ? 'bg-gray-800 hover:bg-black text-white' 
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  <FileText className="w-4 h-4" /> 
-                  <span className="hidden sm:inline">Project Details</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('content')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === 'content' 
-                      ? 'border-b-2 border-blue-600 text-blue-600' 
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  <Layout className="w-4 h-4" /> 
-                  <span className="hidden sm:inline">Content Layout</span>
+                  {isSaving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>
             
-            {/* Conditional Rendering of Pages */}
-            {activeTab === 'form' && (
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-lg shadow">
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Basic Information</h3>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
-                    <input
-                      type="text"
-                      value={selectedWork.name}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, name: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Project Type</label>
-                    <select
-                      value={selectedWork.type}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, type: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="Residential">Residential</option>
-                      <option value="Commercial">Commercial</option>
-                    </select>
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      value={selectedWork.description || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, description: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      rows={4}
-                    />
-                  </div>
+            {/* Tab Navigation */}
+            <div className="flex border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('form')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
+                  activeTab === 'form' 
+                    ? 'border-b-2 border-black text-black' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <FileText className="w-4 h-4" /> 
+                <span className="hidden sm:inline">Project Details</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('content')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
+                  activeTab === 'content' 
+                    ? 'border-b-2 border-black text-black' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <Layout className="w-4 h-4" /> 
+                <span className="hidden sm:inline">Content Layout</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Conditional Rendering of Pages */}
+          {activeTab === 'form' && (
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-lg shadow">
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Basic Information</h3>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                  <input
+                    type="text"
+                    value={selectedWork.name}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, name: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Project Type</label>
+                  <select
+                    value={selectedWork.type}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, type: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                  >
+                    <option value="Residential">Residential</option>
+                    <option value="Commercial">Commercial</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    value={selectedWork.description || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, description: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    rows={4}
+                  />
+                </div>
 
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold mt-6 mb-4 text-gray-800">Project Specifics</h3>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-semibold mt-6 mb-4 text-gray-800">Project Specifics</h3>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={selectedWork.location || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, location: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Completion Year</label>
+                  <input
+                    type="number"
+                    value={selectedWork.completion_year || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, completion_year: parseInt(e.target.value)});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Architects</label>
+                  <input
+                    type="text"
+                    value={selectedWork.architects || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, architects: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Other Participants</label>
+                  <input
+                    type="text"
+                    value={selectedWork.other_participants || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, other_participants: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Photography By</label>
+                  <input
+                    type="text"
+                    value={selectedWork.photography || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, photography: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+                  <input
+                    type="text"
+                    value={selectedWork.area || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, area: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Principal</label>
+                  <input
+                    type="text"
+                    value={selectedWork.principal || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, principal: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Interior Designer</label>
+                  <input
+                    type="text"
+                    value={selectedWork.interior_designer || ''}
+                    onChange={(e) => {
+                      setSelectedWork({...selectedWork, interior_designer: e.target.value});
+                      setHasChanges(true);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL</label>
+                  <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      value={selectedWork.location || ''}
+                      value={selectedWork.main_image || ''}
                       onChange={(e) => {
-                        setSelectedWork({...selectedWork, location: e.target.value});
+                        setSelectedWork({...selectedWork, main_image: e.target.value});
                         setHasChanges(true);
                       }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
+                      placeholder="https://yourdomain.com/image.jpg"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Completion Year</label>
-                    <input
-                      type="number"
-                      value={selectedWork.completion_year || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, completion_year: parseInt(e.target.value)});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Architects</label>
-                    <input
-                      type="text"
-                      value={selectedWork.architects || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, architects: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder=""
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Other Participants</label>
-                    <input
-                      type="text"
-                      value={selectedWork.other_participants || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, other_participants: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder=""
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Photography By</label>
-                    <input
-                      type="text"
-                      value={selectedWork.photography || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, photography: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder=""
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
-                    <input
-                      type="text"
-                      value={selectedWork.area || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, area: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder=""
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Principal</label>
-                    <input
-                      type="text"
-                      value={selectedWork.principal || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, principal: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Interior Designer</label>
-                    <input
-                      type="text"
-                      value={selectedWork.interior_designer || ''}
-                      onChange={(e) => {
-                        setSelectedWork({...selectedWork, interior_designer: e.target.value});
-                        setHasChanges(true);
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={selectedWork.main_image || ''}
-                        onChange={(e) => {
-                          setSelectedWork({...selectedWork, main_image: e.target.value});
-                          setHasChanges(true);
-                        }}
-                        className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="https://yourdomain.com/image.jpg"
-                      />
-                      <button
-                        onClick={async () => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.onchange = async (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                              try {
-                                const url = await handleImageUpload(file);
-                                setSelectedWork({...selectedWork, main_image: url});
-                                setHasChanges(true);
-                                toast.success("Main image uploaded successfully!");
-                              } catch (error) {
-                                toast.error(`Error uploading main image: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                              }
+                    <button
+                      onClick={async () => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = async (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) {
+                            try {
+                              const url = await handleImageUpload(file);
+                              setSelectedWork({...selectedWork, main_image: url});
+                              setHasChanges(true);
+                              toast.success("Main image uploaded successfully!");
+                            } catch (error) {
+                              toast.error(`Error uploading main image: ${error instanceof Error ? error.message : 'Unknown error'}`);
                             }
-                          };
-                          input.click();
-                        }}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-                      >
-                        Upload
-                      </button>
-                    </div>
-                    {selectedWork.main_image && (
-                      <img src={selectedWork.main_image} alt="Main Project" className="mt-4 max-w-xs h-auto rounded-md shadow-sm" />
-                    )}
+                          }
+                        };
+                        input.click();
+                      }}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                    >
+                      Upload
+                    </button>
                   </div>
+                  {selectedWork.main_image && (
+                    <img src={selectedWork.main_image} alt="Main Project" className="mt-4 max-w-xs h-auto rounded-md shadow-sm" />
+                  )}
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {activeTab === 'content' && (
-              <div className="flex-1 overflow-y-auto p-4">
-                {isMobile ? (
-                  <div className="flex items-center justify-center h-full text-gray-500 text-center p-8">
-                    <div>
-                      <p className="text-lg font-medium mb-2">Desktop Experience Required</p>
-                      <p className="text-sm">Please use a desktop or laptop computer to edit content.</p>
-                      <p className="text-sm">The mobile interface doesn't support content editing.</p>
-                    </div>
+          {activeTab === 'content' && (
+            <div className="flex-1 overflow-y-auto p-4">
+              {isMobile ? (
+                <div className="flex items-center justify-center h-full text-gray-500 text-center p-8">
+                  <div>
+                    <p className="text-lg font-medium mb-2">Desktop Experience Required</p>
+                    <p className="text-sm">Please use a desktop or laptop computer to edit content.</p>
+                    <p className="text-sm">The mobile interface doesn't support content editing.</p>
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    {blocks.map((block, index) => (
-                      <div key={block.id} className="relative group w-full">
-                        {/* Block Content */}
-                        {block.type === 'text' ? (
-                          <div 
-                            className={`border rounded-lg bg-white w-full ${
-                              activeBlockId === block.id ? 'ring-2 ring-blue-300' : ''
-                            }`}
-                            onClick={() => setActiveBlockId(block.id)}
-                          >
-                            {activeBlockId === block.id ? (
-                              <>
-                                <EditorToolbar editor={editor} />
-                                <EditorContent 
-                                  editor={editor} 
-                                  className="min-h-[200px] p-4 w-full whitespace-normal" 
-                                />
-                              </>
-                            ) : (
-                              <div 
-                                className="prose max-w-none p-4" 
-                                dangerouslySetInnerHTML={{ __html: block.content }} 
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {blocks.map((block, index) => (
+                    <div key={block.id} className="relative group w-full">
+                      {/* Block Content */}
+                      {block.type === 'text' ? (
+                        <div 
+                          className={`border rounded-lg bg-white w-full ${
+                            activeBlockId === block.id ? 'ring-2 ring-gray-300' : ''
+                          }`}
+                          onClick={() => setActiveBlockId(block.id)}
+                        >
+                          {activeBlockId === block.id ? (
+                            <>
+                              <EditorToolbar editor={editor} />
+                              <EditorContent 
+                                editor={editor} 
+                                className="min-h-[200px] p-4 w-full whitespace-normal" 
                               />
-                            )}
-                          </div>
-                        ) : (
-                          <MediaBlock
-                            src={block.content}
-                            layout={block.layout}
-                            onChangeLayout={(newLayout) => updateBlockLayout(block.id, newLayout)}
-                            onAddMedia={(slotIndex, mediaType) => handleAddMediaToBlock(block.id, slotIndex, mediaType)}
-                            mediaType={block.type === 'video' ? 'video' : 'image'}
-                          />
-                        )}
-                        
-                        <BlockControls
-                          blockId={block.id}
-                          index={index}
-                          totalBlocks={blocks.length}
-                          onMoveUp={() => moveBlock(block.id, 'up')}
-                          onMoveDown={() => moveBlock(block.id, 'down')}
-                          onAdd={() => setShowAddMenu({show: true, blockId: block.id})}
-                          onDelete={() => removeBlock(block.id)}
+                            </>
+                          ) : (
+                            <div 
+                              className="prose max-w-none p-4" 
+                              dangerouslySetInnerHTML={{ __html: block.content }} 
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <MediaBlock
+                          src={block.content}
+                          layout={block.layout}
+                          onChangeLayout={(newLayout) => updateBlockLayout(block.id, newLayout)}
+                          onAddMedia={(slotIndex, mediaType) => handleAddMediaToBlock(block.id, slotIndex, mediaType)}
+                          mediaType={block.type === 'video' ? 'video' : 'image'}
                         />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            Select a work or create a new one to start editing.
-          </div>
-        )}
-        {renderAddMenu()}
-      </div>
+                      )}
+                      
+                      <BlockControls
+                        blockId={block.id}
+                        index={index}
+                        totalBlocks={blocks.length}
+                        onMoveUp={() => moveBlock(block.id, 'up')}
+                        onMoveDown={() => moveBlock(block.id, 'down')}
+                        onAdd={() => setShowAddMenu({show: true, blockId: block.id})}
+                        onDelete={() => removeBlock(block.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {renderAddMenu()}
     </div>
   );
 }

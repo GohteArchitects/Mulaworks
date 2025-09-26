@@ -54,17 +54,17 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/works" className={styles.navLink} passHref>
+                  <Link href="/work" className={styles.navLink} passHref>
                     Works
                   </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/about" className={styles.navLink} passHref>
+                  <Link href="/about" className={styles.navLink} passHref>
                     About Us
                   </Link>
                 </li>
                 <li className={styles.navItem}>
-                  <Link href="/gohte-architects/contact" className={styles.navLink} passHref>
+                  <Link href="/contact" className={styles.navLink} passHref>
                     Contact Us
                   </Link>
                 </li>
