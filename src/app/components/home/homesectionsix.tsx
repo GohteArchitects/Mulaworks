@@ -123,7 +123,7 @@ const HomeSectionSix = () => {
             <h3 className={styles.listTitle}>Contact Us</h3>
             <ul className={styles.list}>
               <li className={styles.listItem}>
-                <a href="mailto:gohtearchitects@gmail.com">gohtearchitects@gmail.com</a>
+                <a href="mailto:admins@andrewgohte.com">admin@andrewgohte.com</a>
               </li>
               <li className={styles.listItem}>
                 <a href="tel:08170000885">0817-0000-885</a>
