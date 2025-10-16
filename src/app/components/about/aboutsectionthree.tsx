@@ -49,7 +49,7 @@ const AboutSectionThree = () => {
               {/* eslint-disable-next-line react/no-unescaped-entities */}
               Reach out — we'd love to hear your ideas.
             </p>
-            <Link href="/gohte-architects/contact" className={styles.contactButton} passHref>
+            <Link href="/contact" className={styles.contactButton} passHref>
               <span className={styles.buttonText}>GET IN TOUCH</span>
             </Link>
           </div>
