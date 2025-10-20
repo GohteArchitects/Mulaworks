@@ -138,12 +138,12 @@ const HomeSectionSix = () => {
             <h3 className={styles.listTitle}>Follow Us On</h3>
             <ul className={styles.list}>
               <li className={styles.listItem}>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.instagram.com/gohtearchitects/" target="_blank" rel="noopener noreferrer">
                   Instagram
                 </a>
               </li>
               <li className={styles.listItem}>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.youtube.com/@gohtearchitects" target="_blank" rel="noopener noreferrer">
                   YouTube
                 </a>
               </li>

@@ -48,7 +48,7 @@ export default function Header() {
             <ul className={styles.socialList}>
               <li className={`${styles.menuItem} ${isMenuOpen ? styles.reveal : styles.hide}`}>
                 <a 
-                  href="https://www.instagram.com/gohtearchitects" 
+                  href="https://www.instagram.com/gohtearchitects/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className={styles.socialLink}
