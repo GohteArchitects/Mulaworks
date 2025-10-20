@@ -235,7 +235,7 @@ const ContactPage = () => {
                 <h3 className={styles.listTitle}>Contact Us</h3>
                 <ul className={styles.list}>
                   <li className={styles.listItem}>
-                    <a href="mailto:admin@andrewgohte.com">admin@andrewgohte.com</a>
+                    <a href="mailto:gohtearchitects@gmail.com">gohtearchitects@gmail.com</a>
                   </li>
                   <li className={styles.listItem}>
                     <a href="tel:08170000885">0817-0000-885</a>
