@@ -235,7 +235,7 @@ const ContactPage = () => {
                 <h3 className={styles.listTitle}>Contact Us</h3>
                 <ul className={styles.list}>
                   <li className={styles.listItem}>
-                    <a href="mailto:gohtearchitects@gmail.com">gohtearchitects@gmail.com</a>
+                    <a href="mailto:admin@andrewgohte.com">admin@andrewgohte.com</a>
                   </li>
                   <li className={styles.listItem}>
                     <a href="tel:08170000885">0817-0000-885</a>
@@ -250,12 +250,12 @@ const ContactPage = () => {
                 <h3 className={styles.listTitle}>Follow Us On</h3>
                 <ul className={styles.list}>
                   <li className={styles.listItem}>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.instagram.com/gohtearchitects/" target="_blank" rel="noopener noreferrer">
                       Instagram
                     </a>
                   </li>
                   <li className={styles.listItem}>
-                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.youtube.com/@gohtearchitects" target="_blank" rel="noopener noreferrer">
                       YouTube
                     </a>
                   </li>
